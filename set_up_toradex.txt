@@ -1,0 +1,8 @@
+Seguir o tutorial no link: https://developer.toradex.com/getting-started/module-2-my-first-hello-world-in-c/configure-toolchain-colibri-imx7?som=colibri-imx7&board=iris-carrier-board
+Seguir o tutorial no link: https://developer.toradex.com/getting-started/module-2-my-first-hello-world-in-c/build-from-command-line?som=colibri-imx7&board=iris-carrier-board
+Set-up do Minicom no link: https://developer.toradex.com/knowledge-base/how-to-setup-environment-for-embedded-linux-application-development
+Ligar placa ao host por meio de USB na porta USB0 e logar no usuário root da placa com senha (vazia)
+Usar o comando ifconfig a fim de saber o IP da placa e do host. Preste atenção em qual terminal você está executando um comando
+Com o IP e máscara da placa alterar as configurações de IP da conexão Ethernet na aba IPv4 e escolhendo o método Manual. Inserir um IP um pouco diferente e a mesma máscara
+Usar o comando scp nome_do_arquivo root@IP_da_placa:caminho_de_onde_se_quer_adicionar
+Configuração do Eclipse no link: https://developer.toradex.com/getting-started/module-2-my-first-hello-world-in-c/configure-eclipse?som=colibri-imx7&board=iris-carrier-board
