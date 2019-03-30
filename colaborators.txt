@@ -1,0 +1,11 @@
+Collaborators:
+
+caiquegarbim
+lklafke
+LPleonardo
+sereno29
+
+Description of the project:
+Assisted car driving/steering in a prototype to avoid colisions through obstacles. This project will use ultrasonic sensors.
+
+Project sponsored by the University of São Paulo (USP).
