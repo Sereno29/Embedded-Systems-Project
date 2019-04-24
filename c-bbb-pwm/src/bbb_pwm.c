@@ -14,7 +14,7 @@
 
 #include <sys/file.h>
 
-#include <assert.h>
+#include <assert.h> // define uma macro que interrompe o programa caso seu argumento seja falso
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -30,13 +30,12 @@
  *
  * @return A new controller, or NULL on failure.
  */
-struct bbb_pwm_controller_t *
-bbb_pwm_controller_new()
+struct bbb_pwm_controller_t *bbb_pwm_controller_new()
 {
   struct bbb_pwm_controller_t *bpc = NULL;
 
   bpc = calloc(sizeof(struct bbb_pwm_controller_t), 1);
-  assert(bpc != NULL);
+  assert(bpc != NULL); // se o conteúdo entre parênteses for falso, então a execução do programa é parada
 
   if(bbb_pwm_controller_init(bpc) != BPRC_OK) {
     bbb_pwm_controller_delete(&bpc);

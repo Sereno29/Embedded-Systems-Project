@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// Enumeração que simula um tipo booleano para a solicitação de pwm
 enum bbb_pwm_state_e
 {
     /**
@@ -26,6 +27,7 @@ enum bbb_pwm_state_e
     BPS_CLAIMED = 1
 };
 
+// Enumeração de mensagens da aplicação
 enum bbb_pwm_return_code_e
 {
     BPRC_NOT_IMPLEMENTED = -100,
@@ -45,19 +47,17 @@ enum bbb_pwm_return_code_e
     BPRC_OK = 0
 };
 
+// Structs utilizadas no projeto
 struct bbb_pwm_t;
 struct bbb_pwm_controller_t;
 
-struct bbb_pwm_controller_t *bbb_pwm_controller_new();
+struct bbb_pwm_controller_t *bbb_pwm_controller_new(); // Função retorna um ponteiro de struct
 void bbb_pwm_controller_delete(struct bbb_pwm_controller_t **bpc_ptr);
-bool bbb_pwm_controller_has_pwm(struct bbb_pwm_controller_t *bpc,
-                                const char *name);
-struct bbb_pwm_t* bbb_pwm_controller_get_pwm(struct bbb_pwm_controller_t *bpc,
-        const char *name);
+bool bbb_pwm_controller_has_pwm(struct bbb_pwm_controller_t *bpc, const char *name);
+struct bbb_pwm_t* bbb_pwm_controller_get_pwm(struct bbb_pwm_controller_t *bpc, const char *name); // Função retorna um ponteiro de struct
 
-struct bbb_pwm_t* bbb_pwm_controller_get_head_pwm(
-    struct bbb_pwm_controller_t *bpc);
-struct bbb_pwm_t* bbb_pwm_get_next_pwm(struct bbb_pwm_t *bp);
+struct bbb_pwm_t* bbb_pwm_controller_get_head_pwm(struct bbb_pwm_controller_t *bpc); // Função retorna um ponteiro de struct
+struct bbb_pwm_t* bbb_pwm_get_next_pwm(struct bbb_pwm_t *bp); // Função retorna um ponteiro de struct
 
 int bbb_pwm_claim(struct bbb_pwm_t *bp);
 int bbb_pwm_unclaim(struct bbb_pwm_t *bp);
@@ -84,6 +84,7 @@ int bbb_pwm_get_polarity(struct bbb_pwm_t *bp, int8_t *out_polarity);
 int bbb_pwm_get_duty_percent(struct bbb_pwm_t *bp, float *out_percent);
 int bbb_pwm_get_frequency(struct bbb_pwm_t *bp, uint32_t *out_hertz);
 
+// Definição de um for específico para a aplicação 
 #define foreach_pwm(bp, bpc) \
     for(struct bbb_pwm_t* bp = bbb_pwm_controller_get_head_pwm(bpc); \
             bp != NULL; bp = bbb_pwm_get_next_pwm(bp))
