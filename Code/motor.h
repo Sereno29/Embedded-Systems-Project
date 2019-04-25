@@ -27,4 +27,9 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
     void go_forward();
     void go_back();
 
+
+    void turning_right(int DUTY_CYCLE_LEFT, int DUTY_CYCLE_RIGHT){
+        
+        
+    }
 #endif
