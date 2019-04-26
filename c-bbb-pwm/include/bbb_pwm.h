@@ -10,7 +10,7 @@
 #ifndef BBB_PWM_H
 #define BBB_PWM_H
 
-#include <stdint.h>
+#include <stdint.h> // Biblioteca que disponibiliza tipos de variáveis como int8_t, uint32_t, etc. Isto deve ser feito pois o sistema BBB pode não reconhecer variáveis como char e int?
 #include <stdbool.h>
 
 // Enumeração que simula um tipo booleano para a solicitação de pwm
@@ -27,7 +27,7 @@ enum bbb_pwm_state_e
     BPS_CLAIMED = 1
 };
 
-// Enumeração de mensagens da aplicação
+// Enumeração de estados do pwm
 enum bbb_pwm_return_code_e
 {
     BPRC_NOT_IMPLEMENTED = -100,
@@ -84,7 +84,7 @@ int bbb_pwm_get_polarity(struct bbb_pwm_t *bp, int8_t *out_polarity);
 int bbb_pwm_get_duty_percent(struct bbb_pwm_t *bp, float *out_percent);
 int bbb_pwm_get_frequency(struct bbb_pwm_t *bp, uint32_t *out_hertz);
 
-// Definição de um for específico para a aplicação 
+// Definição de um for específico para a aplicação, no qual se procura um pwm em uma lista de pwm
 #define foreach_pwm(bp, bpc) \
     for(struct bbb_pwm_t* bp = bbb_pwm_controller_get_head_pwm(bpc); \
             bp != NULL; bp = bbb_pwm_get_next_pwm(bp))

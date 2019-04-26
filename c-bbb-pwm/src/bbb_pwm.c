@@ -10,16 +10,16 @@
 
 #define _GNU_SOURCE
 
-#include <libudev.h>
+#include <libudev.h> // Disponibiza API's (Application Programming Interface) para manipular nodulos de dispositivos e 
 
 #include <sys/file.h>
 
 #include <assert.h> // define uma macro que interrompe o programa caso seu argumento seja falso
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> // FILE
+#include <stdint.h> // define tipos de variáveis para a aplicação
+#include <stdlib.h> // alocação 
+#include <string.h> // funções de manipulação de strings
 #include <inttypes.h>
 #include <unistd.h>
 
@@ -37,15 +37,15 @@ struct bbb_pwm_controller_t *bbb_pwm_controller_new()
   bpc = calloc(sizeof(struct bbb_pwm_controller_t), 1);
   assert(bpc != NULL); // se o conteúdo entre parênteses for falso, então a execução do programa é parada
 
-  if(bbb_pwm_controller_init(bpc) != BPRC_OK) {
-    bbb_pwm_controller_delete(&bpc);
+  if(bbb_pwm_controller_init(bpc) != BPRC_OK) { // caso a inicialização do controlador não der certo
+    bbb_pwm_controller_delete(&bpc); // o controlador é deletado (desalocado)
     goto out;
   }
 
-  bbb_pwm_controller_probe(bpc);
+  bbb_pwm_controller_probe(bpc); // examinando o controlador criado
 
 out:
-  return bpc;
+  return bpc; // retorna o controlador deletado ou examinado, dependendo do resultado da inicialização do controlador
 }
 
 /**
@@ -70,7 +70,7 @@ bbb_pwm_controller_delete(struct bbb_pwm_controller_t **bpc_ptr)
   }
 
   if(bpc->bpc_udev != NULL) {
-    udev_unref(bpc->bpc_udev);
+    udev_unref(bpc->bpc_udev); // o que esta função faz? Faz parte da biblioteca libudev
   }
 
   while(bpc->bpc_head_pwm) {
