@@ -12,11 +12,16 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <unistd.h>
 #include <bbb_pwm.h>
 
 
 #ifndef MOTOR_H
     #define MOTOR_H
+
+    pthread_mutex_t lock;
 
     typedef enum msg{ failure = 0, success = 1}Message;
 
@@ -27,14 +32,17 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
     // Driving 
 
     Message stop();
-    void turning_right(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-    void turning_left(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-    void go_forward();
-    void go_back();
+    void* turning_right(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
+    void* turning_left(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
+    void* go_forward();
+    void* go_back();
 
 
-    void turning_right(int DUTY_CYCLE_LEFT, int DUTY_CYCLE_RIGHT){
+    void* turning_right(int DUTY_CYCLE_LEFT, int DUTY_CYCLE_RIGHT)
+    {
         
+        pthread_mutex_lock(&lock);
+
         struct bbb_pwm_controller_t* bpc = NULL; 
 
         struct bbb_pwm_t* bp_left = NULL;
@@ -78,7 +86,11 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
         bbb_pwm_set_duty_percent(bp_right, DUTY_CYCLE_RIGHT);
 
     out:
-            // Free the controller and all of the PWMs it manages.  
-            bbb_pwm_controller_delete(&bpc);
+        // Free the controller and all of the PWMs it manages.  
+        bbb_pwm_controller_delete(&bpc);
+
+        pthread_mutex_unlock(&lock);
+    
+        return NULL;
     }
 #endif
