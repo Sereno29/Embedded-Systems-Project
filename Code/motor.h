@@ -13,7 +13,7 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
 #ifndef MOTOR_H
     #define MOTOR_H
 
-    typedef enum msg{ failure = 0, success = 1}Message;
+    typedef enum msg{ failure = 0,security = 1, success = 2}Message;
 
     // escala de -10 a 10 para acelerar e freiar
 
