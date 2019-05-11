@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <bbb_pwm.h>
+#include "bbb_pwm.h"
 
 int main() 
 {
@@ -12,12 +12,20 @@ int main()
 
 	bpc = bbb_pwm_controller_new();
 
+	/*
+	if(bpc == NULL)
+		printf("Vc se fudeu\n");
+	*/
+
 	foreach_pwm(bp, bpc) {
 		printf("%s\n", bbb_pwm_get_name(bp));
 	}
 
 	// Try getting a pwm.
 	bp = bbb_pwm_controller_get_pwm(bpc, pwm_name);
+	
+	if(bp == NULL)
+		printf("Erro na bbb_pwm_controller_get_pwm\n");
 
 	if(bp == NULL) {
 		fprintf(stderr, "Failed to get pwm %s.\n", pwm_name);
@@ -31,7 +39,7 @@ int main()
 	bbb_pwm_stop(bp);
 
 	// Lets try setting the duty_percent to FULL SPEED.
-	bbb_pwm_set_duty_percent(bp, 100.0f);
+	bbb_pwm_set_duty_percent(bp, 40.0f);
 
 out:
 		// Free the controller and all of the PWMs it manages.  
