@@ -1,6 +1,7 @@
 #include "motor.h"
+#include <stdlib.h>
 
-// Usar sprintf para comandos de pwm e regular velocidades
+// ******************************** FUNCTIONS TO EXPORT AND ENABLE PWM PINS ******************************** 
 
 // Exporting the pwm pin
 void export(void){
@@ -29,38 +30,58 @@ void disable(void){
     return;
 }
 
+
 // Start pwms 
-void start_pwms(Message *status){
+void start_pwms(State *status){
     export();
     import();
-    *status = success;
+    *status = active;
     return;
 }
 
 // Disable the pwm pins
-void kill_pwms(Message *status){
-    unexport();
+void kill_pwms(State *status){
     disable();
-    *status = failure;
+    unexport();
+    *status = inactive;
     return;
 }
 
-void set_security_speed(void){
-    system("echo 5000000 > /sys/class/pwm/pwmchip7/pwm-7:0/dutycicle ");
-    system("echo 5000000 > /sys/class/pwm/pwmchip7/pwm-7:1/dutycicle ");
+// ******************************** SETTING THE VELOCITY OF THE MOTORS USING DUTY CYCLE ******************************** 
+
+void driving(DutyCicle dc, Operations op){
+    char msg[60];
+    switch(op){
+        case 1: // Go forward
+            sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
+            system(msg);
+            sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
+            system(msg);
+            break;
+        case 2: // Go left
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", LEFT);
+            system(msg);
+            sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
+            system(msg);
+            break;
+        case 3: // Go right
+            sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
+            system(msg);
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", RIGHT);
+            system(msg);
+            break;
+        case 4: // Go back
+            sprintf(msg, "echo -%d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
+            system(msg);
+            sprintf(msg, "echo -%d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
+            system(msg);
+            break;
+        case 5: // Stop
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
+            system(msg);
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
+            system(msg);
+            break;
+    }
     return;
 }
-
-// escala de -10 a 10 para acelerar e freiar
-
-Message disable_port(); // Desabilita o motor em caso de segurança
-
-// Driving 
-
-Message stop();
-void turning_right(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-void turning_left(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-void go_forward(){
-
-}
-void go_back();

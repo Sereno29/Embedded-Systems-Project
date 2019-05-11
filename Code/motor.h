@@ -13,18 +13,22 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
 #ifndef MOTOR_H
     #define MOTOR_H
 
-    typedef enum msg{ failure = 0,security = 1, success = 2}Message;
+    #define LEFT 0
+    #define RIGHT 1
 
-    // escala de -10 a 10 para acelerar e freiar
+    typedef enum stt{  inactive= 0,security = 1, active = 2}State;
 
-    Message disable_port(); // Desabilita o motor em caso de segurança
+    typedef enum dc{ stop = 0, low = 100000, medium = 200000, high = 300000 }DutyCicle;
+
+    typedef enum op{forward, left, right, back, stop}Operations;
+
+    // Starting pwm pins
+    void start_pwms(State*);
+    void kill_pwms(State*);
 
     // Driving 
 
-    Message stop();
-    void turning_right(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-    void turning_left(); // inclui a situação de curva com uma roda travada e a outra rodando ao máximo
-    void go_forward();
-    void go_back();
+    void driving(DutyCicle, Operations);
+    
 
 #endif
