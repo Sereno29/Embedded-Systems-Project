@@ -1,4 +1,5 @@
 #include "motor.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 // ******************************** FUNCTIONS TO EXPORT AND ENABLE PWM PINS ******************************** 
@@ -11,8 +12,8 @@ void export(void){
 }
 // Enabling the pwm pin
 void enable(void){
-    sytem("echo 1 > /sys/class/pwm/pwmchip7/pwm-7:0/enable");
-    sytem("echo 1 > /sys/class/pwm/pwmchip7/pwm-7:1/enable");
+    system("echo 1 > /sys/class/pwm/pwmchip7/pwm-7:0/enable");
+    system("echo 1 > /sys/class/pwm/pwmchip7/pwm-7:1/enable");
     return;
 }
 
@@ -25,8 +26,8 @@ void unexport(void){
 
 // Disabling the pwm pin
 void disable(void){
-    sytem("echo 0 > /sys/class/pwm/pwmchip7/pwm-7:0/enable");
-    sytem("echo 0 > /sys/class/pwm/pwmchip7/pwm-7:1/enable");
+    system("echo 0 > /sys/class/pwm/pwmchip7/pwm-7:0/enable");
+    system("echo 0 > /sys/class/pwm/pwmchip7/pwm-7:1/enable");
     return;
 }
 
@@ -34,7 +35,7 @@ void disable(void){
 // Start pwms 
 void start_pwms(State *status){
     export();
-    import();
+    enable();
     *status = active;
     return;
 }
@@ -50,36 +51,37 @@ void kill_pwms(State *status){
 // ******************************** SETTING THE VELOCITY OF THE MOTORS USING DUTY CYCLE ******************************** 
 
 void driving(DutyCicle dc, Operations op){
+    Operations oper = op;
     char msg[60];
-    switch(op){
-        case 1: // Go forward
+    switch(oper){
+        case 0: // Go forward
             sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
             system(msg);
             sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
             system(msg);
             break;
-        case 2: // Go left
+        case 1: // Go left
             sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", LEFT);
             system(msg);
             sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
             system(msg);
             break;
-        case 3: // Go right
+        case 2: // Go right
             sprintf(msg, "echo %d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
             system(msg);
             sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", RIGHT);
             system(msg);
             break;
-        case 4: // Go back
+        case 3: // Go back
             sprintf(msg, "echo -%d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
             system(msg);
             sprintf(msg, "echo -%d > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
             system(msg);
             break;
-        case 5: // Stop
-            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, LEFT);
+        case 4: // Stop
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", LEFT);
             system(msg);
-            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", dc, RIGHT);
+            sprintf(msg, "echo 0 > /sys/class/pwm/pwmchip7/pwm-7:%d/dutycicle", RIGHT);
             system(msg);
             break;
     }

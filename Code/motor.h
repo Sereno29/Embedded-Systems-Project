@@ -20,7 +20,7 @@ Vamos comprar carrinho na FilipeFlop: R$ 70,00
 
     typedef enum dc{ stop = 0, low = 100000, medium = 200000, high = 300000 }DutyCicle;
 
-    typedef enum op{forward, left, right, back, stop}Operations;
+    typedef enum op{forward, left, right, back, stopping}Operations;
 
     // Starting pwm pins
     void start_pwms(State*);

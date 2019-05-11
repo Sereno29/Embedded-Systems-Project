@@ -1,4 +1,5 @@
 #include "motor.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 int main(void){
@@ -7,11 +8,14 @@ int main(void){
     start_pwms(&st);
     // Various tests of velocity for the motors
     driving(low, forward);
-    delay(10000);
+    for(int i = 0; i<1000000; i++);
+    // delay(10000);
     driving(high, forward);
-    delay(10000);
+    for(int i = 0; i<1000000; i++);
+    // delay(10000);
     driving(stop, stop);
+    for(int i = 0; i<1000000; i++);
     // Killing pwms
     kill_pwms(&st);
-    return;
+    return 0;
 }
