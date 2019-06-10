@@ -1,0 +1,14 @@
+Installing libsoc for cross-compiling
+
+Source: https://github.com/jackmitch/libsoc/issues/29
+
+Commands:
+./configure --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf --build=x86_64-linux
+make clean // if you have already installed the library
+make V=1
+make install
+
+Commands that might help:
+./configure --help // seeing help to use the configure command
+file /usr/local/lib/libsoc.so.2.4.2 // seeing for what architecture the librarie binary was installed 
+ln -s configure ./configure-xablaus // making a link to a file

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "libsoc_debug.h": "c",
+        "libsoc_gpio.h": "c"
+    }
+}
