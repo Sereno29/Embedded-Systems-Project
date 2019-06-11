@@ -12,3 +12,19 @@ Commands that might help:
 ./configure --help // seeing help to use the configure command
 file /usr/local/lib/libsoc.so.2.4.2 // seeing for what architecture the librarie binary was installed 
 ln -s configure ./configure-xablaus // making a link to a file
+
+Cross-compiling the test code:
+ln -s libsoc.so.2.4.2 libsoc.so -> creating link to the librarie
+arm-linux-gnueabihf-gcc gpio_test.c -L. -lsoc -o gpio -> indicate where the libraries are (-L.) and what to link (-libsoc)
+
+Making the compilation time library(file with extension .a) with the files .o given in the installation:
+cd .../libsoc/lib/ -> going to the directory where the .o were installed
+arm-linux-gnueabihf-ar rs libsoc.a *.o 
+
+Cross-compiling the code with the .a library:
+arm-linux-gnueabihf-gcc gpio_test.c -L../../libsoc/lib -lsoc -lpthread -o gpio
+
+Help source:
+
+https://latedev.wordpress.com/2011/07/09/the-gcc-command-line-part-2/
+g++ rmain.cpp libmystuff.a -o roll -> adding the library to the compile command

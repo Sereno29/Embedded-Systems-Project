@@ -32,8 +32,49 @@ BlackGPIO  	button(GPIO_26, input, SecureMode);
 
 */
 
-void set_up_motors(){
+// Defining the pins that will be used to activate the motors
+#define MOTOR_RIGHT_IN1 125
+#define MOTOR_RIGHT_IN2 7
+#define MOTOR_LEFT_IN3 28
+#define MOTOR_LEFT_IN4 93
+#define PWM_CHIP 0
+#define PWM_MOTOR_RIGHT 0
+#define PWM_MOTOR_LEFT 1
 
+// Motor control variables
+pwm *pwm_rig;
+pwm *pwm_lef;
+
+// GPIO's to control the motors
+gpio *in1, *in2; // Right motor
+gpio *in3, *in4; // Left motor
+
+// Enabling the pins to control the motors through PWM and digital ports
+void set_up_motors(){
+    // SETTING THE RIGHT MOTOR
+    // Exporting the pins used to control the H bridge 
+    in1 = libsoc_gpio_request(MOTOR_RIGHT_IN1, LS_GPIO_GREEDY);
+    in2 = libsoc_gpio_request(MOTOR_RIGHT_IN2, LS_GPIO_GREEDY);
+    // Setting the GPIO pins to output
+    libsoc_gpio_set_direction(in1, OUTPUT);
+    libsoc_gpio_set_direction(in2, OUTPUT);
+    // Exporting the PWM pin
+    pwm_rig = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_RIGHT, LS_PWM_GREEDY);
+    libsoc_pwm_set_enabled(pwm_rig, ENABLED);
+
+
+    // SETTING THE LEFT MOTOR
+    // Exporting the pins used to control the H bridge 
+    in3 = libsoc_gpio_request(MOTOR_LEFT_IN3, LS_GPIO_GREEDY);
+    in4 = libsoc_gpio_request(MOTOR_LEFT_IN4, LS_GPIO_GREEDY);
+    // Setting the GPIO pins to output
+    libsoc_gpio_set_direction(in3, OUTPUT);
+    libsoc_gpio_set_direction(in4, OUTPUT);
+    // Exporting the PWM chip
+    pwm_lef = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_LEFT, LS_PWM_GREEDY);
+    libsoc_pwm_set_enabled(pwm_lef, ENABLED);
+
+    return;
 }
 
 void enable_motors(){
