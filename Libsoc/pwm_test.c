@@ -20,7 +20,7 @@
  */
 
 #define PWM_OUTPUT_CHIP 0
-#define PWM_CHIP_OUTPUT 1
+#define PWM_CHIP_OUTPUT 0
 
 int main(void)
 {

@@ -1,4 +1,4 @@
-Installing libsoc for cross-compiling
+Installing libsoc for cross-compiling in a pc with architecture amd64
 
 Source: https://github.com/jackmitch/libsoc/issues/29
 
@@ -8,14 +8,19 @@ make clean // if you have already installed the library
 make V=1
 make install // (try with sudo...)
 
+Recompiling the library after any changes in the files .c located at lib:
+make clean
+make V=1
+sudo make install
+
 Commands that might help:
 ./configure --help // seeing help to use the configure command
-file /usr/local/lib/libsoc.so.2.4.2 // seeing for what architecture the librarie binary was installed 
-ln -s configure ./configure-xablaus // making a link to a file
+file /usr/local/lib/libsoc.so.2.4.2 // seeing for what architecture the library binary was installed. The .so is located in /usr/local/lib
+ln -s configure ./configure-xablaus // making a link to a file. Use it to create a link to the library generated
 
 Cross-compiling the test code:
 ln -s libsoc.so.2.4.2 libsoc.so -> creating link to the librarie
-arm-linux-gnueabihf-gcc gpio_test.c -L. -lsoc -o gpio -> indicate where the libraries are (-L.) and what to link (-libsoc)
+arm-linux-gnueabihf-gcc gpio_test.c -L. -lsoc -o gpio -> indicate where the libraries are (-L.) and what to link (-libsoc). You shoud use the file .a to compile your code
 
 Making the compilation time library(file with extension .a) with the files .o given in the installation:
 cd .../libsoc/lib/ -> going to the directory where the .o were installed
@@ -23,13 +28,45 @@ arm-linux-gnueabihf-ar rs libsoc.a *.o
 
 Cross-compiling the code with the .a library:
 arm-linux-gnueabihf-gcc gpio_test.c -L../../libsoc/lib -lsoc -lpthread -o gpio
+
 Help source:
 
 https://latedev.wordpress.com/2011/07/09/the-gcc-command-line-part-2/
 g++ rmain.cpp libmystuff.a -o roll -> adding the library to the compile command
 
 Adding/Enabling pwm into /sys/class/pwm
-uboot_overlay_addr0-.lib/firmware/BB-PWM2-00A0.dtbo
+uboot_overlay_addr0=/lib/firmware/BB-PWM2-00A0.dtbo -> Add this line to the file uEnv.txt in /boot. The devicetree to enable overlays is in /sys/firmware. The names of the firmware are in /lib/firmware
+
+PWM Names to enable in uEnv.txt
+BB-PWM0-00A0.dtbo
+BB-PWM1-00A0.dtbo
+BB-PWM2-00A0.dtbo
+
+Setting the pin configutation to a PWM
+config-pin -l P9_42 -> seeing the possible states that the pin can function
+config-pin -a P9_42 pwm -> changing the state of the pin to pwm
+config-pin -q P9_42 pwm -> checking if the configuration was successful
+
+Making commands through the terminal inside of /sys/class/pwm/pwmchip%d/pwm-%d:%d
+sudo sh -c "echo 4000 > period"
 
 Changing libsoc to find the right path to the pwms
 sprintf(path, "/sys/class/pwm/pwmchip%d/pwm-%d:%d/polarity", pwm->chip, pwm->chip, pwm->pwm);
+
+Rebuilding .a and .so from libsoc because of the pwm.c path to the exported pwm pins
+arm-linux-gnueabihf-gcc -c pwm.c -> generating the .o for the pwm.c code
+arm-linux-gnueabihf-ar rs libsoc.a *.o -> generating the .a for the new library
+arm-linux-gnueabihf-gcc -fPIC -shared -o libsoc.so.2.4.2 *.c
+
+-fPIC
+           If supported for the target machine, emit position-independent
+           code, suitable for dynamic linking and avoiding any limit on the
+           size of the global offset table.  This option makes a difference on
+           AArch64, m68k, PowerPC and SPARC.
+
+           Position-independent code requires special support, and therefore
+           works only on certain machines.
+
+           When this flag is set, the macros "__pic__" and "__PIC__" are
+           defined to 2.
+

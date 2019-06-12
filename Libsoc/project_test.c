@@ -1,18 +1,35 @@
 // Controlling the BBB using a generic library in C called libsoc for SoC (System on Chip)
 
+// Including auxiliary libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
+// Including libsoc library
 #include "/home/magnus/Documentos/libsoc/lib/include/libsoc_pwm.h"
 #include "/home/magnus/Documentos/libsoc/lib/include/libsoc_debug.h"
 #include "/home/magnus/Documentos/libsoc/lib/include/libsoc_gpio.h"
 
-#define PWM_OUTPUT_CHIP 0
-#define PWM_CHIP_OUTPUT 1
-#define GPIO_OUTPUT  115
-#define GPIO_INPUT   7
+// Prototypes of the motor manipulation functions
+int set_up_motors(void);
+void accelerate_motor_right(Direction direction, int duty_c);
+void accelerate_motor_left(Direction direction, int duty_c);
+void go_forward(int duty_c);
+void turn_right(int level, int duty_c);
+void turn_left(int level, int duty_c);
+void go_backwards(int duty_c);
+void rotate(Direction direction, int duty_c);
+void stop(void);
+void disable_motors(void);
+void free_subsystem_right(void);
+void free_subsystem_left(void);
+
+// Prototypes of the sensor manipulation functions
+int set_up_sensors(void);
+int set_direction(gpio *trig, gpio *echo, int num);
+void send_pulse_US(int sensor);
+void free_sensor(int num);
 
 /* PORTAS USADAS PARA FAZER O ROBO ANDAR E FAZER O SENSORIAMENTO DO AMBIENTE
 
@@ -26,6 +43,128 @@ BlackGPIO  	button(GPIO_26, input, SecureMode);
 
 */
 
+// ************************************CONTROLLING 3 ULTRASSONIC HC-SR04 SENSORS************************************
+
+// Defining the pins that will be used to activate the sensors
+#define TRIG_1 45 // GPIO45 = P8_11
+#define ECHO_1 44 // GPIO44 = P8_12
+#define TRIG_2 69 // GPIO69 = P8_09
+#define ECHO_2 68 // GPIO68 = P8_10
+#define TRIG_3 66 // GPIO66 = P8_07
+#define ECHO_3 67 // GPIO67 = P8_08
+
+// Global variables used to handle the 3 sensors
+gpio *trig1, *echo1; // Front sensor
+gpio *trig2, *echo2; // Right sensor
+gpio *trig3, *echo3; // Left sensor
+
+int set_up_sensors(void){
+    // Setup Sensor 1
+    trig1 = libsoc_gpio_request(TRIG_1, LS_GPIO_GREEDY);
+    echo1 = libsoc_gpio_request(ECHO_1, LS_GPIO_GREEDY);
+    if(trig1 == NULL || echo1 == NULL){
+        ruim1:
+        printf("Não foi possível setar o sensor 1.\n");
+        free_sensor(1);
+        return 1;
+    }else
+        if(set_direction(trig1, echo1, 1))
+            goto ruim1;
+    libsoc_gpio_set_level(trig1, LOW);
+    
+    // Setup Sensor 2
+    trig2 = libsoc_gpio_request(TRIG_2, LS_GPIO_GREEDY);
+    echo2 = libsoc_gpio_request(ECHO_2, LS_GPIO_GREEDY);
+    if(trig2 == NULL || echo2 == NULL){
+        ruim2:
+        printf("Não foi possível setar o sensor 1.\n");
+        free_sensor(1);
+        free_sensor(2);
+        return 1;
+    }else
+        if(set_direction(trig2, echo2, 2))
+            goto ruim2;
+    libsoc_gpio_set_level(trig2, LOW);
+
+    // Setup Sensor 3
+    trig3 = libsoc_gpio_request(TRIG_3, LS_GPIO_GREEDY);
+    echo3 = libsoc_gpio_request(ECHO_3, LS_GPIO_GREEDY);
+    if(trig3 == NULL || echo3 == NULL){
+        ruim3:
+        printf("Não foi possível setar o sensor 1.\n");
+        free_sensor(1);
+        free_sensor(2);
+        free_sensor(3);
+        return 1;
+    }else
+        if(set_direction(trig3, echo3, 3))
+            goto ruim3;
+    libsoc_gpio_set_level(trig3, LOW);
+    
+    return 0;
+}
+
+// Setting the trigger to be a output gpio and the echo to be a input gpio
+int set_direction(gpio *trig, gpio *echo, int num){
+    libsoc_gpio_set_direction(trig, OUTPUT);
+    libsoc_gpio_set_direction(echo, INPUT);
+    if(libsoc_gpio_get_direction(trig) != OUTPUT || libsoc_gpio_get_direction(echo) != INPUT){
+        printf("Falha ao habilitar as portas digitais do sensor %d\n.", num);
+        return 1;
+    }
+    return 0;
+}
+
+// Making a pulse in the trigger as fast as possible
+void send_pulse_US(int sensor){
+    switch(sensor){
+        case 1: // Sensor 1
+            libsoc_gpio_set_level(trig1, HIGH);
+            libsoc_gpio_set_level(trig1, LOW);
+            break;
+        case 2: // Sensor 2
+            libsoc_gpio_set_level(trig2, HIGH);
+            libsoc_gpio_set_level(trig2, LOW);
+            break;
+        case 3: // Sensor 3
+            libsoc_gpio_set_level(trig3, HIGH);
+            libsoc_gpio_set_level(trig3, LOW);
+            break;
+    }
+    return;
+}
+
+// Freeing the sensors 
+void free_sensor(int num){
+    switch(num){
+        case 1:
+            libsoc_gpio_free(trig1);
+            libsoc_gpio_free(echo1);
+            break;
+        case 2:
+            libsoc_gpio_free(trig2);
+            libsoc_gpio_free(echo2);
+            break;
+        case 3:
+        libsoc_gpio_free(trig3);
+        libsoc_gpio_free(echo3);
+        break;
+    }
+    return;
+}
+
+
+// ************************************CONTROLLING 2 DC MOTORS************************************
+
+/* Inside of /sys/class/pwm, we should have the following:
+
+    pwmchip0: eCAP0 - controls only one PWM which is in pin P9_42
+    pwmchip1: ePWM0 - EHRPWM0- controls two PWM pins which are P9_22 and P9_21 (which are PWM0A and PWM0B should confirm with a multimeter)
+
+
+    source: https://stackoverflow.com/questions/50204329/pwm-chip-to-pin-mapping-on-beaglebone-black-v4-14/50204330#50204330
+*/  
+
 // Defining the pins that will be used to activate the motors
 #define MOTOR_RIGHT_IN1 65 // P8_18
 #define MOTOR_RIGHT_IN2 27 // P8_17
@@ -36,6 +175,10 @@ BlackGPIO  	button(GPIO_26, input, SecureMode);
 #define PWM_MOTOR_RIGHT 0 // P8_13
 #define PWM_MOTOR_LEFT 0 // P8_19
 
+typedef enum dir{ clockwise = 0, counterclockwise = 1}Direction;
+
+/* Global variables */
+
 // Motor control variables
 pwm *pwm_rig;
 pwm *pwm_lef;
@@ -45,7 +188,7 @@ gpio *in1, *in2; // Right motor
 gpio *in3, *in4; // Left motor
 
 // Enabling the pins to control the motors through PWM and digital ports
-int set_up_motors(){
+int set_up_motors(void){
     // SETTING THE RIGHT MOTOR
     // Exporting the pins used to control the H bridge 
     in1 = libsoc_gpio_request(MOTOR_RIGHT_IN1, LS_GPIO_GREEDY);
@@ -87,46 +230,107 @@ int set_up_motors(){
     return 0;
 }
 
-// Accelerating the right motor. Direction: 0 = CLOCK-WISE , 1 = COUNTERCLOCK-WISE. Velocity = value between 0 and 1000000.
-void accelerate_motor_right(char direction, unsigned int velocity){
+// Accelerating the right motor. Direction: 0 = CLOCKWISE , 1 = COUNTERCLOCKWISE. Duty_c = VALUE BETWEEN 0-100.
+void accelerate_motor_right(Direction direction, int duty_c){
+    unsigned int duty = 10000 * duty_c;
     // Checks if the motor is enabled
     if( libsoc_pwm_get_enabled(pwm_rig) == ENABLED ){
-        libsoc_pwm_set_duty_cycle(pwm_rig, velocity);
-        if(direction == '0'){ // Go forward (rotate clockwise)
+        if(direction == clockwise){ // Go forward (rotate clockwise)
             libsoc_gpio_set_level(in1, HIGH);
             libsoc_gpio_set_level(in2, LOW);
         }else{ // Go backwards (rotate counter-clockwise)
             libsoc_gpio_set_level(in1, LOW);
             libsoc_gpio_set_level(in2, HIGH);
         }
-    }else{
+        libsoc_pwm_set_duty_cycle(pwm_rig, duty);
+    }else
         printf("Portas pwm não estão habilitadas");
-    }
     return;
 }
 
-// Accelerating the right motor. Direction: 0 = CLOCK-WISE , 1 = COUNTERCLOCK-WISE. Velocity = value between 0 and 1000000.
-void accelerate_motor_left(char direction, unsigned int velocity){
+// Accelerating the right motor. Direction: 0 = CLOCKWISE , 1 = COUNTERCLOCKWISE. Duty_c = VALUE BETWEEN 0-100.
+void accelerate_motor_left(Direction direction, int duty_c){
+    unsigned int duty = 10000 * duty_c;
     // Checks if the motor is enabled
-    if( libsoc_pwm_get_enabled(pwm_rig) == ENABLED ){
-        libsoc_pwm_set_duty_cycle(pwm_rig, velocity);
-        if(direction == '0'){ // Go forward (rotate clockwise)
-            libsoc_gpio_set_level(in1, HIGH);
-            libsoc_gpio_set_level(in2, LOW);
+    if( libsoc_pwm_get_enabled(pwm_lef) == ENABLED ){
+        if(direction == clockwise){ // Go forward (rotate clockwise)
+            libsoc_gpio_set_level(in3, HIGH);
+            libsoc_gpio_set_level(in4, LOW);
         }else{ // Go backwards (rotate counter-clockwise)
-            libsoc_gpio_set_level(in1, LOW);
-            libsoc_gpio_set_level(in2, HIGH);
+            libsoc_gpio_set_level(in3, LOW);
+            libsoc_gpio_set_level(in4, HIGH);
         }
-    }else{
+        libsoc_pwm_set_duty_cycle(pwm_lef, duty);
+    }else
         printf("Portas pwm não estão habilitadas");
+    return;
+}
+
+// Make both motors operate clockwise and go forward
+void go_forward(int duty_c){
+    accelerate_motor_left(clockwise, duty_c);
+    accelerate_motor_right(clockwise, duty_c);
+    return;
+}
+
+void turn_left(int level, int duty_c){
+    accelerate_motor_right(clockwise, duty_c);
+    if(duty_c - level > 0)
+        accelerate_motor_left(clockwise, duty_c - level);
+    else
+        accelerate_motor_left(clockwise, 0);
+    return;
+}
+
+void turn_right(int level, int duty_c){
+    accelerate_motor_left(clockwise, duty_c);
+    if(duty_c - level > 0)
+        accelerate_motor_right(clockwise, duty_c - level);
+    else
+        accelerate_motor_right(clockwise, 0);
+    return;
+}
+
+// Make both motors operate counterclockwise and go backwards
+void go_backwards(int duty_c){
+    accelerate_motor_left(counterclockwise, duty_c);
+    accelerate_motor_right(counterclockwise, duty_c);
+    return;
+}
+
+// Make motors operate in different directions
+void rotate(Direction direction, int duty_c){
+    if(direction == clockwise){
+        accelerate_motor_left(direction, duty_c);
+        accelerate_motor_right(counterclockwise, duty_c);
+    }else{
+        accelerate_motor_left(direction, duty_c);
+        accelerate_motor_right(clockwise, duty_c);
     }
     return;
 }
 
-void accelerate_motor_left(char direction, int velocity){
-
+// Stopping both motors
+void stop(void){
+    // Putting the duty cycle to 0
+    libsoc_pwm_set_duty_cycle(pwm_rig, 0);
+    libsoc_pwm_set_duty_cycle(pwm_lef, 0);
+    // Setting the level of the digital pins in the H bridge to 0
+    libsoc_gpio_set_level(in1, LOW);
+    libsoc_gpio_set_level(in2, LOW);
+    libsoc_gpio_set_level(in3, LOW);
+    libsoc_gpio_set_level(in4, LOW);
+    return;
 }
 
+// Disable the ports from the motors
+void disable_motors(void){
+    libsoc_pwm_set_enabled(pwm_rig, DISABLED);
+    libsoc_pwm_set_enabled(pwm_lef, DISABLED);
+    return;
+}
+
+// Freeing the pwm and gpios controlling the right motor
 void free_subsystem_right(void){
     libsoc_gpio_free(in1);
     libsoc_gpio_free(in2);
@@ -134,6 +338,7 @@ void free_subsystem_right(void){
     return;
 }
 
+// Freeing the pwm and gpios controlling the left motor
 void free_subsystem_left(void){
     libsoc_gpio_free(in3);
     libsoc_gpio_free(in4);
@@ -142,6 +347,19 @@ void free_subsystem_left(void){
 }
 
 int main(){
-
-    return;
+    // Enable debug output
+    libsoc_set_debug(1);
+    if(set_up_motors() == 1) // if setup is not successful then end program
+        return 1;
+    rotate(clockwise, 60);
+    sleep(30);
+    rotate(counterclockwise, 60);
+    sleep(30);
+    stop();
+    disable_motors();
+    free_subsystem_left();
+    free_subsystem_right();
+    // Disable debug output
+    libsoc_set_debug(0);
+    return 0;
 }
