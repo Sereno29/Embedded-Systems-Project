@@ -11,6 +11,8 @@
 #include "/home/magnus/Documentos/libsoc/lib/include/libsoc_debug.h"
 #include "/home/magnus/Documentos/libsoc/lib/include/libsoc_gpio.h"
 
+typedef enum dir{ clockwise = 0, counterclockwise = 1}Direction;
+
 // Prototypes of the motor manipulation functions
 int set_up_motors(void);
 void accelerate_motor_right(Direction direction, int duty_c);
@@ -174,8 +176,6 @@ void free_sensor(int num){
 #define PWM_CHIP_RIGHT 6 // EHRPWM2B - RIGHT MOTOR
 #define PWM_MOTOR_RIGHT 0 // P8_13
 #define PWM_MOTOR_LEFT 0 // P8_19
-
-typedef enum dir{ clockwise = 0, counterclockwise = 1}Direction;
 
 /* Global variables */
 
