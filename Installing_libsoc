@@ -23,8 +23,13 @@ arm-linux-gnueabihf-ar rs libsoc.a *.o
 
 Cross-compiling the code with the .a library:
 arm-linux-gnueabihf-gcc gpio_test.c -L../../libsoc/lib -lsoc -lpthread -o gpio
-
 Help source:
 
 https://latedev.wordpress.com/2011/07/09/the-gcc-command-line-part-2/
 g++ rmain.cpp libmystuff.a -o roll -> adding the library to the compile command
+
+Adding/Enabling pwm into /sys/class/pwm
+uboot_overlay_addr0-.lib/firmware/BB-PWM2-00A0.dtbo
+
+Changing libsoc to find the right path to the pwms
+sprintf(path, "/sys/class/pwm/pwmchip%d/pwm-%d:%d/polarity", pwm->chip, pwm->chip, pwm->pwm);
