@@ -6,7 +6,7 @@ Commands:
 ./configure --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf --build=x86_64-linux
 make clean // if you have already installed the library
 make V=1
-make install
+make install // (try with sudo...)
 
 Commands that might help:
 ./configure --help // seeing help to use the configure command
