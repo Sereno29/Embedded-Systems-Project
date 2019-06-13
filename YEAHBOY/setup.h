@@ -1,19 +1,10 @@
-#ifndef SETUP
-#define SETUP
+#ifndef SETUP_H
+    #define SETUP_H
 
-// Including auxiliary libraries
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/time.h>
+    #include "libs.h"
 
-// Including libsoc library
-#include "libsoc_pwm.h"
-#include "libsoc_debug.h"
-#include "libsoc_gpio.h"
-
-// FUNCTIONS
-
+    // FUNCTIONS
+    int gpio_setup(void);
+    int set_up_motors(void);
 
 #endif

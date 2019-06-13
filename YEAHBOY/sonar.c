@@ -1,5 +1,6 @@
 #include "sonar.h"
 
+extern int FLAG;
 
 void sonar_distance(gpio *trigger, gpio *echo){
     int i = 0;
@@ -35,9 +36,9 @@ void sonar_distance(gpio *trigger, gpio *echo){
 
     if(distance < 30){
         if(distance < 20)
-            flag = 2;
+            FLAG = 2;
         else
-            flag = 1;
+            FLAG = 1;
     }else
-        flag = 0;
+        FLAG = 0;
 }

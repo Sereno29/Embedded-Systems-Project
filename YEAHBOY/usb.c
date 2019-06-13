@@ -1,39 +1,22 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include <sys/ioctl.h>
-#include <linux/usbdevice_fs.h>
-
-#include "motor.h"
-#include "sonar.h"
-
-
-#define JS_EVENT_BUTTON	0x01	/*buttonpressed/released*/
-#define JS_EVENT_AXIS	0x02	/*joystickmoved*/
-#define JS_EVENT_INIT	0x80	/*initialstateofdevice*/
-
-#define Axis_Range	32757
-#define PWM 		1000000	//PWM max
-
-#define vwarning	750000	//Vel on warning flag
-#define vturn		800000	//180 turing vel
-#define DELAY		500		//time to turn
-#define vmin		500000	// minimum velocity value
+#include "libs.h"
 
 // Global Variables
-int flag = 2;
+int FLAG = 2;
 long long conversion = Axis_Range/PWM;
 double vmax = 0;
 int dir;
 int REng;		//Right Engine
 int LEng;		//Left Engine
 int status = 1;
+
+// Motor
+pwm *pwm_rig;
+pwm *pwm_lef;
+extern gpio *in1, *in2; // Right motor
+extern gpio *in3, *in4; // Left motor
+
+// Sensor
+gpio *trigger ,*echo; 
 
 
 //About engine control
@@ -99,10 +82,15 @@ int main(){
 
 	if (fd<0){
 		//Canot open dev blink Red LED
-		led_red = lisbsoc_gpio_request()
+		led_red = libsoc_gpio_request(LED_RED, LS_GPIO_SHARED);
+		libsoc_gpio_set_direction(led_red, OUTPUT);
+		libsoc_gpio_set_level(led_red, HIGH);
 		
 	}else{
 		//Sucess bright Green LED
+		led_green = libsoc_gpio_request(LED_RED, LS_GPIO_SHARED);
+		libsoc_gpio_set_direction(led_red, OUTPUT);
+		libsoc_gpio_set_level(led_red, HIGH);
 	}
 
 
@@ -142,6 +130,7 @@ int main(){
 					default:
 					break;
 					
+				}
 			}else{
 				engine(e.number, e.value);	
 				accelarate_motor_right(dir, REng);	//Call Engine

@@ -328,9 +328,11 @@ int main(){
     if(set_up_motors() == 1) // if setup is not successful then end program
         return 1;
     rotate(clockwise, 500000);
-    sleep(30);
-    rotate(counterclockwise, 500000);
-    sleep(30);
+    // accelerate_motor_left(counterclockwise, 1000000);
+    // go_forward(1000000);
+    sleep(20);
+    // rotate(counterclockwise, 1000000);
+    // sleep(20);
     stop();
     disable_motors();
     free_subsystem_left();
