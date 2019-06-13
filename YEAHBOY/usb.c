@@ -21,9 +21,10 @@
 #define Axis_Range	32757
 #define PWM 		1000000	//PWM max
 
-#define vwarning	500000	//Vel on warning flag
+#define vwarning	750000	//Vel on warning flag
 #define vturn		800000	//180 turing vel
-#define DELAY		500	//time to turn
+#define DELAY		500		//time to turn
+#define vmin		500000	// minimum velocity value
 
 // Global Variables
 int flag = 2;
@@ -38,7 +39,7 @@ int status = 1;
 //About engine control
 void engine (int number, int value){
 	if (number == 1 && FLAG == 0){ 		//Normal
-		vmax = abs(value);
+		vmax = abs(value*conversion);
 		if(value > 0){
 			dir = 0;
 		}else{
@@ -47,39 +48,39 @@ void engine (int number, int value){
 	}else if (number == 1 && FLAG == 1){	//Warning
 			if(value > 0){
 				dir = 0;
-				if(abs(value) < warning){
-					vmax = abs(value);
+				if(abs(value*conversion) < vwarning){
+					vmax = abs(value*conversion);
 				}else{
 					vmax = vwarning;
 				}
 			}else{
-				vmax = abs(value);
+				vmax = abs(value*conversion);
 				dir = 1;
 			}
 	}else if (number == 1 && FLAG == 2){ 	//Danger
 			if(value > 0){
 				vmax = 0;
 			}else{
-				vmax = abs(value);
+				vmax = abs(value*conversion);
 				dir = 1;
 			}
 	}else{					//Car direction
 		if(value > 0){ 					//car is turning to right side	
 			LEng = vmax; 				//Left wheel full speed
-			REng = vmax - vmax*(value/Axis_Range); 	//Right wheel slower
+			REng = vmax - vmax*(value*PWM); 	//Right wheel slower
 		}else{
 			REng = vmax;
-			LEng = vmax - vmax*(value/Axis_Range);
+			LEng = vmax - vmax*(value*PWM); //rever
 		}
 	}
 }
 
 
 struct js_event{
-unsigned int	 time;/*eventtimestampinmilliseconds*/
-short		 value;/*value*/
-unsigned char	 type;/*eventtype*/
-unsigned char 	number;/*axis/buttonnumber*/
+	unsigned int	 time;/*eventtimestampinmilliseconds*/
+	short		 value;/*value*/
+	unsigned char	 type;/*eventtype*/
+	unsigned char 	number;/*axis/buttonnumber*/
 };
 
 
@@ -87,8 +88,9 @@ unsigned char 	number;/*axis/buttonnumber*/
 int main(){
 
 	gpio *trigger, *echo;
+	gpio *led_green, *led_red;
 
-	// if(setup(trigger, echo) == 1{
+	// if(setup(trigger, echo) == 1){
 	// 	kill_car();
 	// 	return 1;
 	// }
@@ -97,6 +99,7 @@ int main(){
 
 	if (fd<0){
 		//Canot open dev blink Red LED
+		led_red = lisbsoc_gpio_request()
 		
 	}else{
 		//Sucess bright Green LED
@@ -116,7 +119,7 @@ int main(){
 			if(e.type == JS_EVENT_BUTTON){
 				//Put a Switch function to do things when pushing buttons
 				switch(e.number){
-					case: 6 //Back buttom Disable avoidance colision
+					case 6: //Back buttom Disable avoidance colision
 						
 					break;
 					
