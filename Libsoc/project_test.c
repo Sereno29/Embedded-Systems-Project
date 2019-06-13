@@ -1,37 +1,5 @@
 // Controlling the BBB using a generic library in C called libsoc for SoC (System on Chip)
-
-// Including auxiliary libraries
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-
-// Including libsoc library
-#include "/home/magnus/Documentos/libsoc/lib/include/libsoc_pwm.h"
-#include "/home/magnus/Documentos/libsoc/lib/include/libsoc_debug.h"
-#include "/home/magnus/Documentos/libsoc/lib/include/libsoc_gpio.h"
-
-typedef enum dir{ clockwise = 0, counterclockwise = 1}Direction;
-
-// Prototypes of the motor manipulation functions
-int set_up_motors(void);
-void accelerate_motor_right(Direction direction, int duty_c);
-void accelerate_motor_left(Direction direction, int duty_c);
-void go_forward(int duty_c);
-void turn_right(int level, int duty_c);
-void turn_left(int level, int duty_c);
-void go_backwards(int duty_c);
-void rotate(Direction direction, int duty_c);
-void stop(void);
-void disable_motors(void);
-void free_subsystem_right(void);
-void free_subsystem_left(void);
-
-// Prototypes of the sensor manipulation functions
-int set_up_sensors(void);
-int set_direction(gpio *trig, gpio *echo, int num);
-void send_pulse_US(int sensor);
-void free_sensor(int num);
+#include "motor.h"
 
 /* PORTAS USADAS PARA FAZER O ROBO ANDAR E FAZER O SENSORIAMENTO DO AMBIENTE
 
@@ -161,8 +129,9 @@ void free_sensor(int num){
 /* Inside of /sys/class/pwm, we should have the following:
 
     pwmchip0: eCAP0 - controls only one PWM which is in pin P9_42
-    pwmchip1: ePWM0 - EHRPWM0- controls two PWM pins which are P9_22 and P9_21 (which are PWM0A and PWM0B should confirm with a multimeter)
-
+    pwmchip1: ePWM0 - EHRPWM0- controls two PWM pins which are P9_22 and P9_21 (which are PWM0A and PWM0B, respectively, should confirm with a multimeter) - 4830 0200
+    pwmchip4: ePWM1 - EHRPWM1 - controls two PWM pins which are P9_14 and P9_16 ( which are PWM1A and PWM1B, respectively, should confirm with a multimeter) - 4830 2200
+    pwmchip7: ePWM2 - EHRPWM2 - controls two PWM pins which are P8_19 and P8_13 (which are PWM2A and PWM2B, respectively, should confirm with a multimeter) - 4830 4200
 
     source: https://stackoverflow.com/questions/50204329/pwm-chip-to-pin-mapping-on-beaglebone-black-v4-14/50204330#50204330
 */  
@@ -171,10 +140,9 @@ void free_sensor(int num){
 #define MOTOR_RIGHT_IN1 65 // P8_18
 #define MOTOR_RIGHT_IN2 27 // P8_17
 #define MOTOR_LEFT_IN3 47 // P8_15
-#define MOTOR_LEFT_IN4 46 // P8_16
-#define PWM_CHIP_LEFT 5 // EHRPWM2A - LEFT MOTOR
-#define PWM_CHIP_RIGHT 6 // EHRPWM2B - RIGHT MOTOR
-#define PWM_MOTOR_RIGHT 0 // P8_13
+#define MOTOR_LEFT_IN4 46 // P8_16 
+#define PWM_CHIP 7 // EHRPWM2B - RIGHT MOTOR - P8_13 - pwmchip7 e pwm-7:1 // EHRPWM2A - LEFT MOTOR - P8_19 - pwmchip7 e pwm -7:0
+#define PWM_MOTOR_RIGHT 1 // P8_13
 #define PWM_MOTOR_LEFT 0 // P8_19
 
 /* Global variables */
@@ -197,7 +165,7 @@ int set_up_motors(void){
     libsoc_gpio_set_direction(in1, OUTPUT);
     libsoc_gpio_set_direction(in2, OUTPUT);
     // Exporting and enabling the PWM pin
-    pwm_rig = libsoc_pwm_request(PWM_CHIP_RIGHT, PWM_MOTOR_RIGHT, LS_PWM_GREEDY);
+    pwm_rig = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_RIGHT, LS_PWM_GREEDY);
     libsoc_pwm_set_enabled(pwm_rig, ENABLED);
     if( in1 == NULL || in2 == NULL || pwm_rig == NULL || libsoc_pwm_get_enabled(pwm_rig) != ENABLED){ // Checking if everything went well
         free_subsystem_right();
@@ -216,7 +184,7 @@ int set_up_motors(void){
     libsoc_gpio_set_direction(in3, OUTPUT);
     libsoc_gpio_set_direction(in4, OUTPUT);
     // Exporting and enabling the PWM chip
-    pwm_lef = libsoc_pwm_request(PWM_CHIP_LEFT, PWM_MOTOR_LEFT, LS_PWM_GREEDY);
+    pwm_lef = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_LEFT, LS_PWM_GREEDY);
     libsoc_pwm_set_enabled(pwm_lef, ENABLED);
     if( in3 == NULL || in4 == NULL || pwm_lef == NULL || libsoc_pwm_get_enabled(pwm_lef) != ENABLED){
         free_subsystem_right();
@@ -232,7 +200,6 @@ int set_up_motors(void){
 
 // Accelerating the right motor. Direction: 0 = CLOCKWISE , 1 = COUNTERCLOCKWISE. Duty_c = VALUE BETWEEN 0-100.
 void accelerate_motor_right(Direction direction, int duty_c){
-    unsigned int duty = 10000 * duty_c;
     // Checks if the motor is enabled
     if( libsoc_pwm_get_enabled(pwm_rig) == ENABLED ){
         if(direction == clockwise){ // Go forward (rotate clockwise)
@@ -242,7 +209,7 @@ void accelerate_motor_right(Direction direction, int duty_c){
             libsoc_gpio_set_level(in1, LOW);
             libsoc_gpio_set_level(in2, HIGH);
         }
-        libsoc_pwm_set_duty_cycle(pwm_rig, duty);
+        libsoc_pwm_set_duty_cycle(pwm_rig, duty_c);
     }else
         printf("Portas pwm não estão habilitadas");
     return;
@@ -250,7 +217,6 @@ void accelerate_motor_right(Direction direction, int duty_c){
 
 // Accelerating the right motor. Direction: 0 = CLOCKWISE , 1 = COUNTERCLOCKWISE. Duty_c = VALUE BETWEEN 0-100.
 void accelerate_motor_left(Direction direction, int duty_c){
-    unsigned int duty = 10000 * duty_c;
     // Checks if the motor is enabled
     if( libsoc_pwm_get_enabled(pwm_lef) == ENABLED ){
         if(direction == clockwise){ // Go forward (rotate clockwise)
@@ -260,7 +226,7 @@ void accelerate_motor_left(Direction direction, int duty_c){
             libsoc_gpio_set_level(in3, LOW);
             libsoc_gpio_set_level(in4, HIGH);
         }
-        libsoc_pwm_set_duty_cycle(pwm_lef, duty);
+        libsoc_pwm_set_duty_cycle(pwm_lef, duty_c);
     }else
         printf("Portas pwm não estão habilitadas");
     return;
@@ -332,6 +298,8 @@ void disable_motors(void){
 
 // Freeing the pwm and gpios controlling the right motor
 void free_subsystem_right(void){
+    libsoc_gpio_set_level(in1, LOW);
+    libsoc_gpio_set_level(in2, LOW);
     libsoc_gpio_free(in1);
     libsoc_gpio_free(in2);
     libsoc_pwm_free(pwm_rig);
@@ -340,9 +308,17 @@ void free_subsystem_right(void){
 
 // Freeing the pwm and gpios controlling the left motor
 void free_subsystem_left(void){
+    libsoc_gpio_set_level(in3, LOW);
+    libsoc_gpio_set_level(in4, LOW);
     libsoc_gpio_free(in3);
     libsoc_gpio_free(in4);
     libsoc_pwm_free(pwm_lef);
+    return;
+}
+
+void kill_car(void){
+    free_subsystem_left();
+    free_subsystem_right();
     return;
 }
 
@@ -351,9 +327,9 @@ int main(){
     libsoc_set_debug(1);
     if(set_up_motors() == 1) // if setup is not successful then end program
         return 1;
-    rotate(clockwise, 60);
+    rotate(clockwise, 500000);
     sleep(30);
-    rotate(counterclockwise, 60);
+    rotate(counterclockwise, 500000);
     sleep(30);
     stop();
     disable_motors();

@@ -70,3 +70,9 @@ arm-linux-gnueabihf-gcc -fPIC -shared -o libsoc.so.2.4.2 *.c
            When this flag is set, the macros "__pic__" and "__PIC__" are
            defined to 2.
 
+
+Showing configurations in the uEnv.txt to solve the pinmux not found
+sudo /opt/scripts/tools/version.sh -> 
+
+Seeing the pins that can be configured by pin-config
+cd /sys/devices/platform/ocp -> directory where the pins can be configured
