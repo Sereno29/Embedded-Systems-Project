@@ -132,6 +132,7 @@ int main(){
 							accelerate_motor_right(1, vturn);
 							accelerate_motor_left(0, vturn);
 							sleep(DELAY);
+							breaking();
 						}
 					break;
  
@@ -140,12 +141,14 @@ int main(){
 							accelerate_motor_right(0, vturn);
 							accelerate_motor_left(1, vturn);
 							sleep(DELAY);
+							breaking();
 						}
 					break;
 
 					case 1: // Brake with B button
 						if(e.value == 1){
 							breaking();
+							sleep(1);
 						}
 					break;
 

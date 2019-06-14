@@ -36,11 +36,12 @@ void sonar_distance(gpio *trigger, gpio *echo){
 
     if(distance > 400)
         return;
-    if(distance < 30){
-        if(distance < 20)
+    if(distance < 40){
+        if(distance < 28)
             FLAG = 2;
         else
             FLAG = 1;
     }else
         FLAG = 0;
+    return;
 }

@@ -71,14 +71,20 @@ int motor_setup(void){
 
     // Exporting and enabling the PWM pin
     pwm_rig = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_RIGHT, LS_PWM_GREEDY);
-    libsoc_pwm_set_enabled(pwm_rig, ENABLED);
-    if( pwm_rig == NULL || libsoc_pwm_get_enabled(pwm_rig) != ENABLED){ // Checking if everything went well
-        free_subsystem_right();
-        printf("Right motor setup error\n");
-        return 1;
-    }
     // Setting the period of the pwm
     libsoc_pwm_set_period(pwm_rig, 1000000);
+    libsoc_pwm_set_enabled(pwm_rig, ENABLED);
+    if( pwm_rig == NULL){ // Checking if everything went well
+        free_subsystem_right();
+        printf("Right motor setup error - PWM REQUEST\n");
+        return 1;
+    }
+    
+    if(libsoc_pwm_get_enabled(pwm_rig) != ENABLED){ // Checking if everything went well
+        free_subsystem_right();
+        printf("Right motor setup error - PWM ENABLE\n");
+        return 1;
+    }
 
 
     // ===== SETTING THE LEFT MOTOR ============================
@@ -108,6 +114,8 @@ int motor_setup(void){
 
     // Exporting and enabling the PWM chip
     pwm_lef = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_LEFT, LS_PWM_GREEDY);
+    // Setting the period of the pwm
+    libsoc_pwm_set_period(pwm_lef, 1000000);
     libsoc_pwm_set_enabled(pwm_lef, ENABLED);
     if( pwm_lef == NULL || libsoc_pwm_get_enabled(pwm_lef) != ENABLED){
         free_subsystem_right();
@@ -115,8 +123,6 @@ int motor_setup(void){
         printf("Left motor setup error\n");
         return 1;
     }
-    // Setting the period of the pwm
-    libsoc_pwm_set_period(pwm_lef, 1000000);
 
     return 0;
 }
