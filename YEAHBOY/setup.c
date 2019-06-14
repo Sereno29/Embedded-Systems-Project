@@ -15,7 +15,8 @@ int sonar_setup(void){
 
     // Ensure both gpio were successfully requested
     if (trigger == NULL || echo == NULL){
-       return 1;
+        printf("Failed request sonar GPIO\n");
+        return 1;
     }
   
     // Set direction to OUTPUT
@@ -43,39 +44,75 @@ int sonar_setup(void){
 
 // Enabling the pins to control the motors through PWM and digital ports
 int motor_setup(void){
-    // SETTING THE RIGHT MOTOR
+    // ===== SETTING THE RIGHT MOTOR ============================
     // Exporting the pins used to control the H bridge 
     in1 = libsoc_gpio_request(MOTOR_RIGHT_IN1, LS_GPIO_GREEDY);
     in2 = libsoc_gpio_request(MOTOR_RIGHT_IN2, LS_GPIO_GREEDY);
+
+    if (in1 == NULL || in2 == NULL){
+        printf("Failed request enable pins in1, in2\n");
+        return 1;
+    }
+
     // Setting the GPIO pins to output
     libsoc_gpio_set_direction(in1, OUTPUT);
+    // Check the direction
+    if (libsoc_gpio_get_direction(in1) != OUTPUT){
+        printf("Failed to set direction to in1\n");
+        return 1;
+    }
+
     libsoc_gpio_set_direction(in2, OUTPUT);
+    // Check the direction
+    if (libsoc_gpio_get_direction(in2) != OUTPUT){
+        printf("Failed to set direction to in2\n");
+        return 1;
+    }
+
     // Exporting and enabling the PWM pin
     pwm_rig = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_RIGHT, LS_PWM_GREEDY);
     libsoc_pwm_set_enabled(pwm_rig, ENABLED);
-    if( in1 == NULL || in2 == NULL || pwm_rig == NULL || libsoc_pwm_get_enabled(pwm_rig) != ENABLED){ // Checking if everything went well
+    if( pwm_rig == NULL || libsoc_pwm_get_enabled(pwm_rig) != ENABLED){ // Checking if everything went well
         free_subsystem_right();
-        printf("Erro no setup do motor direito.\n");
+        printf("Right motor setup error\n");
         return 1;
     }
     // Setting the period of the pwm
     libsoc_pwm_set_period(pwm_rig, 1000000);
 
 
-    // SETTING THE LEFT MOTOR
+    // ===== SETTING THE LEFT MOTOR ============================
     // Exporting the pins used to control the H bridge 
-    in3 = libsoc_gpio_request(MOTOR_LEFT_IN3, LS_GPIO_GREEDY);
-    in4 = libsoc_gpio_request(MOTOR_LEFT_IN4, LS_GPIO_GREEDY);
+    in3 = libsoc_gpio_request(MOTOR_RIGHT_IN3, LS_GPIO_GREEDY);
+    in4 = libsoc_gpio_request(MOTOR_RIGHT_IN4, LS_GPIO_GREEDY);
+
+    if (in3 == NULL || in4 == NULL){
+        printf("Failed request enable pins in3, in4\n");
+        return 1;
+    }
+
     // Setting the GPIO pins to output
     libsoc_gpio_set_direction(in3, OUTPUT);
+    // Check the direction
+    if (libsoc_gpio_get_direction(in3) != OUTPUT){
+        printf("Failed to set direction to in3\n");
+        return 1;
+    }
+
     libsoc_gpio_set_direction(in4, OUTPUT);
+    // Check the direction
+    if (libsoc_gpio_get_direction(in4) != OUTPUT){
+        printf("Failed to set direction to in4\n");
+        return 1;
+    }
+
     // Exporting and enabling the PWM chip
     pwm_lef = libsoc_pwm_request(PWM_CHIP, PWM_MOTOR_LEFT, LS_PWM_GREEDY);
     libsoc_pwm_set_enabled(pwm_lef, ENABLED);
-    if( in3 == NULL || in4 == NULL || pwm_lef == NULL || libsoc_pwm_get_enabled(pwm_lef) != ENABLED){
+    if( pwm_lef == NULL || libsoc_pwm_get_enabled(pwm_lef) != ENABLED){
         free_subsystem_right();
         free_subsystem_left();
-        printf("Erro no setup do motor esquerdo.\n");
+        printf("Left motor setup error\n");
         return 1;
     }
     // Setting the period of the pwm

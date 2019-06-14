@@ -66,10 +66,15 @@ int main(){
 
 	gpio *led_green, *led_red;
 
+	printf("Program running ...\n");
+
 	if(sonar_setup() == 1 || motor_setup() == 1){
 	 	kill_car();
+		printf("SETUP ERROR\n");
 	 	return 1;
 	}
+
+	printf("Setup successful ...\n");
 
 	int fd = open("/dev/input/js0",O_RDONLY);
 
@@ -90,10 +95,10 @@ int main(){
 	struct js_event e;
 		//e.number number of button/axis
 		//e.value value read
+		//e.time time pressed
 		
 
-	while(status)
-		{
+	while(status){
 		read(fd, &e, sizeof(e));
 
 		if(e.type == JS_EVENT_BUTTON || e.type == JS_EVENT_AXIS){
@@ -101,35 +106,45 @@ int main(){
 				//Put a Switch function to do things when pushing buttons
 				switch(e.number){
 					case 6: //Back buttom Disable avoidance colision
-						if(us_control == 1){
-							us_control = 0;
-							FLAG = 0;
-							libsoc_gpio_set_level(led_red, HIGH);
-						}
-						else{
-							us_control = 1;
-							libsoc_gpio_set_level(led_red, LOW);
+						if(e.value == 1){
+							if(us_control == 1){
+								us_control = 0;
+								FLAG = 0;
+								libsoc_gpio_set_level(led_red, HIGH);
+							}
+							else{
+								us_control = 1;
+								libsoc_gpio_set_level(led_red, LOW);
+							}
 						}
 					break;
 					
 					case 7:	//Start buttom kill all
-						status = 0;
+						if(e.value == 1){
+							status = 0;
+						}
 					break;
 
 					case 5:	//Buttom Right 180 right turn
-						accelarate_motor_right(1, vturn);
-						accelarate_motor_left(0, vturn);
-						delay(DELAY);
+						if(e.value == 1){
+							accelerate_motor_right(1, vturn);
+							accelerate_motor_left(0, vturn);
+							sleep(DELAY);
+						}
 					break;
  
 					case 4:	//Button Left 180 left turn
-						accelarate_motor_right(0, vturn);
-						accelarate_motor_left(1, vturn);
-						delay(DELAY);
+						if(e.value == 1){
+							accelerate_motor_right(0, vturn);
+							accelerate_motor_left(1, vturn);
+							sleep(DELAY);
+						}
 					break;
 
 					case 1: // Brake with B button
-						breaking();
+						if(e.value == 1){
+							breaking();
+						}
 					break;
 
 					default:
@@ -138,13 +153,14 @@ int main(){
 				}
 			}else{
 				engine(e.number, e.value);	
-				accelarate_motor_right(dir, REng);	//Call Engine
-				accelarate_motor_left(dir, LEng);
+				accelerate_motor_right(dir, REng);	//Call Engine
+				accelerate_motor_left(dir, LEng);
 			}
 		}
-		
+
 		if(us_control == 1)
 			sonar_distance(trigger, echo);
+			printf("FLAG: %d\n", FLAG);
 	}
 	
 	kill_car();
