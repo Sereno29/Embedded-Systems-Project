@@ -48,9 +48,9 @@
     #define Axis_Range	33000
     #define PWM 		1000000	//PWM max
 
-    #define vwarning	750000	// Vel on warning flag
-    #define vturn		800000	// 180 turing vel
-    #define DELAY		0.5		// time to turn
+    #define vwarning	600000	// Vel on warning flag
+    #define vturn		700000	// 180 turing vel
+    #define DELAY		1		// time to turn
     #define vmin		500000	// minimum velocity value
     #define LED_RED		62		// Beaglebone Black pin to control red led - P8_21
     #define LED_GREEN 	36		// Beaglebone Black pin to control green led - P8_23
