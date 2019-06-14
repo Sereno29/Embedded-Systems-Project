@@ -4,7 +4,7 @@
     #include "libs.h"
 
     // FUNCTIONS
-    int gpio_setup(void);
-    int set_up_motors(void);
+    int sonar_setup(void);
+    int motor_setup(void);
 
 #endif

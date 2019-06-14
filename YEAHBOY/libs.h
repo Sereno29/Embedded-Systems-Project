@@ -4,6 +4,13 @@
     // Enumeration for the motor
     typedef enum dir{ clockwise = 0, counterclockwise = 1}Direction;
     
+    struct js_event{
+        unsigned int	 time;/*eventtimestampinmilliseconds*/
+        short		 value;/*value*/
+        unsigned char	 type;/*eventtype*/
+        unsigned char 	number;/*axis/buttonnumber*/
+    };
+
     // Including auxiliary libraries
 
     #include <stdio.h>

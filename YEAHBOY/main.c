@@ -12,8 +12,8 @@ int status = 1;
 // Motor
 pwm *pwm_rig;
 pwm *pwm_lef;
-extern gpio *in1, *in2; // Right motor
-extern gpio *in3, *in4; // Left motor
+gpio *in1, *in2; // Right motor
+gpio *in3, *in4; // Left motor
 
 // Sensor
 gpio *trigger ,*echo; 
@@ -47,36 +47,29 @@ void engine (int number, int value){
 				vmax = abs(value*conversion);
 				dir = 1;
 			}
-	}else{					//Car direction
+	}else if( number == 3){					//Car direction
 		if(value > 0){ 					//car is turning to right side	
 			LEng = vmax; 				//Left wheel full speed
-			REng = vmax - vmax*(value*PWM); 	//Right wheel slower
+			REng = vmax - vmax*(value/Axis_Range); 	//Right wheel slower
 		}else{
 			REng = vmax;
-			LEng = vmax - vmax*(value*PWM); //rever
+			LEng = vmax - vmax*(value/Axis_Range); //rever
 		}
 	}
 }
 
 
-struct js_event{
-	unsigned int	 time;/*eventtimestampinmilliseconds*/
-	short		 value;/*value*/
-	unsigned char	 type;/*eventtype*/
-	unsigned char 	number;/*axis/buttonnumber*/
-};
-
-
 
 int main(){
 
-	gpio *trigger, *echo;
+	int us_control = 1;
+
 	gpio *led_green, *led_red;
 
-	// if(setup(trigger, echo) == 1){
-	// 	kill_car();
-	// 	return 1;
-	// }
+	if(sonar_setup() == 1 || motor_setup() == 1){
+	 	kill_car();
+	 	return 1;
+	}
 
 	int fd = open("/dev/input/js0",O_RDONLY);
 
@@ -88,9 +81,9 @@ int main(){
 		
 	}else{
 		//Sucess bright Green LED
-		led_green = libsoc_gpio_request(LED_RED, LS_GPIO_SHARED);
-		libsoc_gpio_set_direction(led_red, OUTPUT);
-		libsoc_gpio_set_level(led_red, HIGH);
+		led_green = libsoc_gpio_request(LED_GREEN, LS_GPIO_SHARED);
+		libsoc_gpio_set_direction(led_green, OUTPUT);
+		libsoc_gpio_set_level(led_green, HIGH);
 	}
 
 
@@ -108,7 +101,15 @@ int main(){
 				//Put a Switch function to do things when pushing buttons
 				switch(e.number){
 					case 6: //Back buttom Disable avoidance colision
-						
+						if(us_control == 1){
+							us_control = 0;
+							FLAG = 0;
+							libsoc_gpio_set_level(led_red, HIGH);
+						}
+						else{
+							us_control = 1;
+							libsoc_gpio_set_level(led_red, LOW);
+						}
 					break;
 					
 					case 7:	//Start buttom kill all
@@ -126,7 +127,11 @@ int main(){
 						accelarate_motor_left(1, vturn);
 						delay(DELAY);
 					break;
-					
+
+					case 1: // Brake with B button
+						breaking();
+					break;
+
 					default:
 					break;
 					
@@ -136,10 +141,10 @@ int main(){
 				accelarate_motor_right(dir, REng);	//Call Engine
 				accelarate_motor_left(dir, LEng);
 			}
-		}else{
-			//Light up Green LED (Waiting command)
 		}
-		sonar_distance(trigger, echo);
+		
+		if(us_control == 1)
+			sonar_distance(trigger, echo);
 	}
 	
 	kill_car();

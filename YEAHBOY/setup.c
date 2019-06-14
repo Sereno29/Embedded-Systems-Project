@@ -5,9 +5,9 @@ extern gpio *trigger, *echo;
 extern gpio *in1, *in2, *in3, *in4;
 extern pwm *pwm_rig, *pwm_lef;
 
-// Setup of the GPIO ports
+// Setup of the Sonar GPIO ports
 // Returns 1 when errors occur, 0 everything ok
-int gpio_setup(void){
+int sonar_setup(void){
 
      // Request gpios
     trigger = libsoc_gpio_request(GPIO_TRIGGER, LS_GPIO_SHARED);
@@ -42,7 +42,7 @@ int gpio_setup(void){
 }
 
 // Enabling the pins to control the motors through PWM and digital ports
-int set_up_motors(void){
+int motor_setup(void){
     // SETTING THE RIGHT MOTOR
     // Exporting the pins used to control the H bridge 
     in1 = libsoc_gpio_request(MOTOR_RIGHT_IN1, LS_GPIO_GREEDY);
