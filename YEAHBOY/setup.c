@@ -83,8 +83,8 @@ int motor_setup(void){
 
     // ===== SETTING THE LEFT MOTOR ============================
     // Exporting the pins used to control the H bridge 
-    in3 = libsoc_gpio_request(MOTOR_RIGHT_IN3, LS_GPIO_GREEDY);
-    in4 = libsoc_gpio_request(MOTOR_RIGHT_IN4, LS_GPIO_GREEDY);
+    in3 = libsoc_gpio_request(MOTOR_LEFT_IN3, LS_GPIO_GREEDY);
+    in4 = libsoc_gpio_request(MOTOR_LEFT_IN4, LS_GPIO_GREEDY);
 
     if (in3 == NULL || in4 == NULL){
         printf("Failed request enable pins in3, in4\n");
