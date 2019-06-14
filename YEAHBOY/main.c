@@ -28,7 +28,7 @@ void engine (int number, float value){
 		}else{
 			dir = 1;
 		}
-	}else if (number == 1 && FLAG == 1){	//Warning
+	}else if ( (number == 1 && FLAG == 1) || (number == 0 && FLAG == 1 ) ){	//Warning
 			if(value < 0){
 				dir = 0;
 				if(abs(value*conversion) < vwarning){
@@ -40,11 +40,14 @@ void engine (int number, float value){
 				vmax = abs(value*conversion);
 				dir = 1;
 			}
-	}else if (number == 1 && FLAG == 2){ 	//Danger
+	}else if ( (number == 1 && FLAG == 2) || (number == 0 && FLAG == 2 ) ){ 	//Danger
 			if(value < 0){
 				vmax = 0;
+				REng = LEng = vmax;
+				breaking();
 			}else{
 				vmax = abs(value*conversion);
+				REng = LEng = vmax;
 				dir = 1;
 			}
 	}else if( number == 0){					//Car direction
