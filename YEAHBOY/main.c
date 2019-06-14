@@ -4,7 +4,7 @@
 int FLAG = 2;
 long long conversion = Axis_Range/PWM;
 double vmax = 0;
-int dir;
+int dir;		//0 forward and 1 backward
 int REng;		//Right Engine
 int LEng;		//Left Engine
 int status = 1;
