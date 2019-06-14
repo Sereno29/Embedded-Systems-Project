@@ -34,6 +34,8 @@ void sonar_distance(gpio *trigger, gpio *echo){
         //printf("DISTANCE: %.2f cm\t", distance);
     }
 
+    if(distance > 400)
+        return;
     if(distance < 30){
         if(distance < 20)
             FLAG = 2;

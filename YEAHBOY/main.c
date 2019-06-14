@@ -2,7 +2,7 @@
 
 // Global Variables
 int FLAG = 2;
-long long conversion = Axis_Range/PWM;
+long long conversion = PWM/Axis_Range;
 double vmax = 0;
 int dir;
 int REng;		//Right Engine
@@ -20,16 +20,16 @@ gpio *trigger ,*echo;
 
 
 //About engine control
-void engine (int number, int value){
+void engine (int number, float value){
 	if (number == 1 && FLAG == 0){ 		//Normal
 		vmax = abs(value*conversion);
-		if(value > 0){
+		if(value < 0){
 			dir = 0;
 		}else{
 			dir = 1;
 		}
 	}else if (number == 1 && FLAG == 1){	//Warning
-			if(value > 0){
+			if(value < 0){
 				dir = 0;
 				if(abs(value*conversion) < vwarning){
 					vmax = abs(value*conversion);
@@ -41,19 +41,19 @@ void engine (int number, int value){
 				dir = 1;
 			}
 	}else if (number == 1 && FLAG == 2){ 	//Danger
-			if(value > 0){
+			if(value < 0){
 				vmax = 0;
 			}else{
 				vmax = abs(value*conversion);
 				dir = 1;
 			}
-	}else if( number == 3){					//Car direction
+	}else if( number == 0){					//Car direction
 		if(value > 0){ 					//car is turning to right side	
 			LEng = vmax; 				//Left wheel full speed
 			REng = vmax - vmax*(value/Axis_Range); 	//Right wheel slower
 		}else{
 			REng = vmax;
-			LEng = vmax - vmax*(value/Axis_Range); //rever
+			LEng = vmax + vmax*(value/Axis_Range);
 		}
 	}
 }
@@ -111,10 +111,12 @@ int main(){
 								us_control = 0;
 								FLAG = 0;
 								libsoc_gpio_set_level(led_red, HIGH);
+								printf("Disable AC\n");
 							}
 							else{
 								us_control = 1;
 								libsoc_gpio_set_level(led_red, LOW);
+								printf("Enable AC\n");
 							}
 						}
 					break;

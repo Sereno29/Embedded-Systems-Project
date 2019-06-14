@@ -45,7 +45,7 @@
     #define JS_EVENT_AXIS	0x02	/* joystickmoved */
     #define JS_EVENT_INIT	0x80	/* initialstateofdevice*/
 
-    #define Axis_Range	32757
+    #define Axis_Range	33000
     #define PWM 		1000000	//PWM max
 
     #define vwarning	750000	// Vel on warning flag

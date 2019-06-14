@@ -111,6 +111,9 @@ void breaking(void){
     libsoc_gpio_set_level(in2, HIGH);
     libsoc_gpio_set_level(in3, HIGH);
     libsoc_gpio_set_level(in4, HIGH);
+
+    sleep(1);
+
     return;
 }
 
