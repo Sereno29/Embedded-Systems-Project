@@ -1,4 +1,4 @@
-# Embedded-Systems-Project
+# Embedded-Systems-Project (English)
 _Assisted Car Steering to Avoid Collisions_
 
 This project focuses on the development of a car robot controlled remotely by a Xbox 360 controller connected through USB to a BeagleBone Black and with ultrassonic sensors providing assistance to the steering process of the robot. The sensors estimate the position of obstacles (walls) and avoid collisions by making the robot stop in a safe distance to the object:
@@ -26,7 +26,7 @@ After this initial attempt, the members opted to try the [BoneScript library](ht
 After this second attempt, the members started to work with the [BlackLib](http://blacklib.yigityuce.com/) which is a library in C/C++ written to control Beaglebone Black's features such as the communication of analogic ports, PwM, GPIO, UART communication, SPI and I2C. Because the versions of this library were developed for the kernel 3.x of the Debian OS in the time, the execution of the codes presented difficulties with the PWM ports as well as the input digital GPIO's. These difficulties were due to differences in the Device Tree Overlays between the kernel versions 3.x and the version used in this project which was the 4.14 (Debian 9.5 2018-10-07 4GB SD IoT). This updated version can be found in [here](https://beagleboard.org/latest-images).
 
 Finally, the project migrated to use the [Libsoc library](https://jackmitch.github.io/libsoc/) which is a C language library that interfaces with common peripherals found in System on Chip(SoC) through generic Linux kernel interfaces. Searching through forums, the github issues tab and reaching the responsible for the library, we were able to adapt the installation of the library in order to cross-compile the library files(.h and .c --> .o, .lo, .so and .a) as well as our own code that makes use of the functions implemented in this library files. The adaptations necessary are due to the change of path to the pwm ports in the sysfs. In the new kernel, they are presented as /sys/class/pwm/pwmchip0/pwm-0:0 and in the old kernel versions they were /sys/class/pwm/pwmchip0/pwm0. These changes of path were made in the pwm.c that comes in the standard library installation which can be done followed [here](https://github.com/jackmitch/libsoc).
-```
+
 In **Libsoc**, [pwm.c](https://github.com/Sereno29/Embedded-Systems-Project/blob/master/Libsoc/pwm.c), was altered. See how one of the functions looks like after the alteration:
 
 ```
@@ -61,7 +61,7 @@ Source: Libsoc: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
 # Embedded-Systems-Project
 _Robô com Direção Assistida para Prevenção de Colisões_
 
-Esse projeto consiste em desenvolver um carrinho controlado remotamente, por joystick USB, e com auxílio de direção de sensores de ultrassom. Os sensores estimam a posição de obstáculos (paredes) e evitam a colisão alterando o comportamento do carro:
+Esse projeto consiste em desenvolver um carrinho controlado remotamente por controle de Xbox 360 e conectado por USB, além de possuir auxílio de direção por meio de sensores de ultrassom. Os sensores estimam a posição de obstáculos (paredes) e evitam a colisão alterando o comportamento do carro:
 
 - Obstáculos afastados em mais de 30 cm: direção livre pelo joystick;
 - Obstáculos entre 30 e 20 cm: velocidade máxima reduzida, controlável ainda pelo joystick;
@@ -73,6 +73,8 @@ Esse projeto consiste em desenvolver um carrinho controlado remotamente, por joy
 - Dois (2x) [Motores DC DG01D-A130](https://www.robocore.net/loja/motores/motor-dc-3-6v-com-caixa-de-reducao-e-eixo-duplo);
 - Três (3x) sensores de ultrassom [HC-SR04](https://www.robocore.net/loja/sensores/sensor-de-distancia-ultrassonico-hc-sr04);
 - Bateria Li-Po 9V;
+- [MH Level converter](https://www.mepits.com/product/2413/converters/mh-level-converter);
+- Circuito Regulador de Tensão para alimentar a BeagleBone Black por meio da bateria de 9V
 - Jumpers, protoboard...
 
 ## Histórico
