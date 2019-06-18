@@ -9,9 +9,9 @@ This project focuses on the development of a car robot controlled remotely by a 
 
 ## Componentes - _Bill of Materials_
 - Beaglebone Black Rev C, with Debian 9.5 2018-10-07 4GB SD IoT installled;
-- L298N Motor Drive Controller Board Module Dual H Bridge [L298N](https://www.amazon.com/Qunqi-Controller-Module-Stepper-Arduino/dp/B014KMHSW6/ref=pd_cp_328_2?pd_rd_w=2spqf&pf_rd_p=ef4dc990-a9ca-4945-ae0b-f8d549198ed6&pf_rd_r=5PYWEXETQC33M4BDRFQP&pd_rd_r=76c4bafe-91f5-11e9-8704-597ede040640&pd_rd_wg=oJWKh&pd_rd_i=B014KMHSW6&psc=1&refRID=5PYWEXETQC33M4BDRFQP);
+- [L298N Motor Drive Controller Board Module Dual H Bridge](https://www.amazon.com/Qunqi-Controller-Module-Stepper-Arduino/dp/B014KMHSW6/ref=pd_cp_328_2?pd_rd_w=2spqf&pf_rd_p=ef4dc990-a9ca-4945-ae0b-f8d549198ed6&pf_rd_r=5PYWEXETQC33M4BDRFQP&pd_rd_r=76c4bafe-91f5-11e9-8704-597ede040640&pd_rd_wg=oJWKh&pd_rd_i=B014KMHSW6&psc=1&refRID=5PYWEXETQC33M4BDRFQP);
 - Two (2x) [DC Motors DG01D-A130 3-6V](https://www.alibaba.com/product-detail/3v-6v-9v-dc-flat-motor_60755111901.html?spm=a2700.7724857.normalList.149.66fddd90uUyg67);
-- Three (3x) Ultrassonic Sensors [HC-SR04](https://www.alibaba.com/product-detail/HC-SR04-Ultrasonic-Sensor-Module-HC_60787536064.html?spm=a2700.7724857.normalList.76.4ac73e2eXOXmhw);
+- Three (3x) [Ultrassonic Sensors HC-SR04](https://www.alibaba.com/product-detail/HC-SR04-Ultrasonic-Sensor-Module-HC_60787536064.html?spm=a2700.7724857.normalList.76.4ac73e2eXOXmhw);
 - 9V Li-Po Battery;
 - [MH Level converter](https://www.mepits.com/product/2413/converters/mh-level-converter);
 - Voltage regulator circuit to power the BeagleBone through the 9V Battery
@@ -19,7 +19,7 @@ This project focuses on the development of a car robot controlled remotely by a 
 
 ## History of the Project
 
-In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to Travis Lane who helped us with our questions! Unfortunately, we didn't use the API in our application.
+In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application.
 
 After this initial attempt, the members opted to try the [BoneScript library](https://beagleboard.org/Support/BoneScript/) in order to develop the coding of the project in a similar way as we would program an Arduino, since the BoneScript library is very similar commands to the Arduino library. This library is based on the JavaScript language and runs through the help of the Node.js interpreter already within the BeagleBone Black. However, during some tests regarding the response time of the language to the activation of the sensors, the members realized that the response time is too long ( > 30 ms) which didn't meet the project's requirement to use the HC-SR04 sensor. The [HC-SR04 datasheet](https://www.mouser.com/ds/2/813/HCSR04-1022824.pdf) mentions that the pulse to send a wave through the trigger should have around 0.01 ms.
 
@@ -54,24 +54,24 @@ int libsoc_pwm_set_enabled(pwm *pwm, pwm_enabled enabled)
 }
 ```
 
-Source: BlackLib: [BlackLib v3.0](https://github.com/yigityuce/BlackLib/tree/master/v3_0)
+Source: [BlackLib v3.0](https://github.com/yigityuce/BlackLib/tree/master/v3_0)
 
-Source: Libsoc: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
+Source: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
  
-# Embedded-Systems-Project
+# Projeto de Sistemas Embarcados (Português)
 _Robô com Direção Assistida para Prevenção de Colisões_
 
-Esse projeto consiste em desenvolver um carrinho controlado remotamente por controle de Xbox 360 e conectado por USB, além de possuir auxílio de direção por meio de sensores de ultrassom. Os sensores estimam a posição de obstáculos (paredes) e evitam a colisão alterando o comportamento do carro:
+Esse projeto consiste em desenvolver um carrinho controlado remotamente por controle de Xbox 360 conectado por USB a uma BeagleBone Black, além de possuir auxílio de direção por meio de sensores de ultrassom. Os sensores estimam a posição de obstáculos (paredes) e evitam a colisão alterando o comportamento do carro:
 
-- Obstáculos afastados em mais de 30 cm: direção livre pelo joystick;
-- Obstáculos entre 30 e 20 cm: velocidade máxima reduzida, controlável ainda pelo joystick;
-- Obstáculos mais próximo de 20 cm: impedimento total de avançar na direção em que o obstáculo foi identificado.
+- Obstáculos afastados em mais de 300 mm: direção livre pelo joystick;
+- Obstáculos entre 300 e 200 mm: velocidade máxima reduzida, controlável ainda pelo joystick;
+- Obstáculos mais próximo de 200 mm: impedimento total de avançar na direção em que o obstáculo foi identificado.
 
-## Componentes - _Bill of Materials_
+## Componentes
 - Beaglebone Black Rev C, com Debian 9.5 2018-10-07 4GB SD IoT instalada;
-- Módulo driver de motor com ponte H [L298N](https://www.robocore.net/loja/drivers-de-motores/driver-motor-ponte-h-l298n);
+- [Módulo driver de motor com ponte H L298N](https://www.robocore.net/loja/drivers-de-motores/driver-motor-ponte-h-l298n);
 - Dois (2x) [Motores DC DG01D-A130](https://www.robocore.net/loja/motores/motor-dc-3-6v-com-caixa-de-reducao-e-eixo-duplo);
-- Três (3x) sensores de ultrassom [HC-SR04](https://www.robocore.net/loja/sensores/sensor-de-distancia-ultrassonico-hc-sr04);
+- Três (3x) [Sensores de Ultrassom HC-SR04](https://www.robocore.net/loja/sensores/sensor-de-distancia-ultrassonico-hc-sr04);
 - Bateria Li-Po 9V;
 - [MH Level converter](https://www.mepits.com/product/2413/converters/mh-level-converter);
 - Circuito Regulador de Tensão para alimentar a BeagleBone Black por meio da bateria de 9V
@@ -79,7 +79,9 @@ Esse projeto consiste em desenvolver um carrinho controlado remotamente por cont
 
 ## Histórico
 
-Inicialmente foi utilizado a biblioteca [BoneScript](https://beagleboard.org/Support/BoneScript/) para desenvolver os códigos. Essa biblioteca é baseada em JavaScript e roda sobre o interpretador Node.js na Beaglebone Black, porém ao testar a implementação em JavaScript para os sensores de ultrassom percebeu-se um tempo de resposta muito grande (> 30 ms) para tal aplicação sendo assim crítico para o projeto o uso dessa linguagem. 
+Primeiramente, os membros do grupo encontraram uma [API](https://github.com/Coderlane/c-pwm-api) no github em linguagem C e tentaram fazer a cross-compilation do código na BeagleBone Black. Essa tentativa de compilação não resultou em sucesso, uma vez que a API (Application Programming Interface) utilizava a bibliteca udev e a expertise do grupo quanto a cross-compile e sistemas Debian (ativando pwm e gpios por meio do comando config-pin ou pelo arquivo uEnv.txt) ainda estava em desenvolvimento. Muito obrigado ao [Travis Lane](https://github.com/coderlane), o criador da API, por ter nos ajudado quanto a nossas perguntas a respeito do código e cross-compile! Infelizmente, não utilizamos a API na nossa aplicação.
+
+Após essa primeira tentativa, foi utilizada a biblioteca [BoneScript](https://beagleboard.org/Support/BoneScript/) para desenvolver os códigos do projeto. Essa biblioteca é baseada em JavaScript e roda sobre o interpretador Node.js na Beaglebone Black, porém ao testar a implementação em JavaScript para os sensores de ultrassom percebeu-se um tempo de resposta muito grande (> 30 ms) para tal aplicação sendo assim crítico para o projeto o uso dessa linguagem. 
 
 Logo, o projeto mudou para o desenvolvimento em C/C++ com o auxílio da biblioteca **BlackLib** que tem capacidade de gerenciar a comunicação das portas analógicas, sinal PWM, GPIO, comunicação UART, SPI e I2C. Entretanto, devido as versões dessa biblioteca terem sido desenvolvidas para SO sob o Kernel Linux 3.x na então época, a execução dos códigos apresentou problemas com as portas PWM devido a diferenças de Device Tree Overlays entre as versões de Kernel 3.x e a versão utilizada 4.14 (na Debian 9.5 2018-10-07 4GB SD IoT).
 
@@ -119,9 +121,9 @@ int libsoc_pwm_set_enabled(pwm *pwm, pwm_enabled enabled)
 }
 ```
 
-Fonte BlackLib: [BlackLib v3.0](https://github.com/yigityuce/BlackLib/tree/master/v3_0)
+Fonte: [BlackLib v3.0](https://github.com/yigityuce/BlackLib/tree/master/v3_0)
 
-Fonte Libsoc: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
+Fonte: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
 
 ## Desenvolvedores/Developers
 - [Caique Garbin](https://github.com/caiquegarbin)
