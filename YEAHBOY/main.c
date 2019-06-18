@@ -1,9 +1,12 @@
-#include "libs.h"
+// Main file where the polling proces occurs
 
-// Global Variables
-int FLAG = 2;
-long long conversion = PWM/Axis_Range;
-double vmax = 0;
+#include "libs.h" // adding the libraries used and definitions
+
+// GLOBAL VARIABLES
+
+int FLAG = 2; // stop flag
+long long conversion = PWM/Axis_Range; // conversion coefficient to convert the value from the Xbox controller into a duty cycle from 0 to 1000000
+double vmax = 0; // maximum value for the duty cycle
 int dir;		//0 forward and 1 backward
 int REng;		//Right Engine
 int LEng;		//Left Engine
@@ -19,7 +22,8 @@ gpio *in3, *in4; // Left motor
 gpio *trigger ,*echo; 
 
 
-//About engine control
+// Functions that receives the data from the controller. INPUTS: number = the button pressed, value: the value of the button
+// There are analogic buttons and digital ones. 
 void engine (int number, float value){
 	if (number == 1 && FLAG == 0){ 		//Normal
 		vmax = abs(value*conversion);

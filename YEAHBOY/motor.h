@@ -14,13 +14,5 @@
     void stop(void);
     void breaking(void);
     void disable_motors(void);
-    void free_subsystem_right(void);
-    void free_subsystem_left(void);
-
-    // Prototypes of the sensor manipulation functions
-    int set_up_sensors(void);
-    int set_direction(gpio *trig, gpio *echo, int num);
-    void send_pulse_US(int sensor);
-    void free_sensor(int num);
 
 #endif

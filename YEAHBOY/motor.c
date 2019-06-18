@@ -51,6 +51,7 @@ void go_forward(int duty_c){
     return;
 }
 
+// Turn left in a with a certain level/angle
 void turn_left(int level, int duty_c){
     accelerate_motor_right(clockwise, duty_c);
     if(duty_c - level > 0)
@@ -60,6 +61,7 @@ void turn_left(int level, int duty_c){
     return;
 }
 
+// Turn right in a with a certain level/angle
 void turn_right(int level, int duty_c){
     accelerate_motor_left(clockwise, duty_c);
     if(duty_c - level > 0)
