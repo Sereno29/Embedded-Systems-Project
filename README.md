@@ -1,6 +1,8 @@
 # Embedded-Systems-Project (English)
 _Assisted Car Steering to Avoid Collisions_
 
+![](/Embedded-Systems-Project/CarrinhoProntoImagens/isometrica.jpeg =300x)
+
 This project focuses on the development of a car robot controlled remotely by a Xbox 360 controller connected through USB to a BeagleBone Black and with ultrassonic sensors providing assistance to the steering process of the robot. The sensors estimate the position of obstacles (walls) and avoid collisions by making the robot stop in a safe distance to the object:
 
 - Obstacles are 300 mm near the sensor: controller executes freely the commands from the user;
@@ -17,9 +19,36 @@ This project focuses on the development of a car robot controlled remotely by a 
 - Voltage regulator circuit to power the BeagleBone through the 9V Battery
 - Jumpers, protoboard...
 
+![](/Embedded-Systems-Project/CarrinhoProntoImagens/frontal.jpeg =150x)
+![](/Embedded-Systems-Project/CarrinhoProntoImagens/lateral.jpeg =150x)
+
 ## History of the Project
 
-In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application.
+In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application. The library demanded had to come from the proper architecture sources, then the ARM architecture was required on the sources.list repo, as suggested by the own Travis Lane:
+```
+# Mark existing sources as amd64/i386 for x86
+sudo sed -i.bak "s/deb /deb [arch=amd64,i386] /g" /etc/apt/sources.list
+
+# Add ARM repos
+sudo tee -a /etc/apt/sources.list << END
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs` main multiverse restricted universe
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs`-updates main multiverse restricted universe
+END
+
+# Add armhf
+sudo dpkg --add-architecture armhf
+
+# Refresh your package cache
+sudo apt update
+
+# Install the armhf version of the library
+sudo apt install libudev-dev:armhf
+```
+Then, on the terminal, the compilation was run as follow (e.g. with the pwm sources and output named "test"):
+```
+arm-linux-gnueabihf-gcc bbb_pwm.c bbb_pwm_example.c -o test -ludev
+```
+Nevertheless, cross-compiling with this API had not lead to signifcant results once the problems with Device Tree Overlays arise.
 
 After this initial attempt, the members opted to try the [BoneScript library](https://beagleboard.org/Support/BoneScript/) in order to develop the coding of the project in a similar way as we would program an Arduino, since the BoneScript library is very similar commands to the Arduino library. This library is based on the JavaScript language and runs through the help of the Node.js interpreter already within the BeagleBone Black. However, during some tests regarding the response time of the language to the activation of the sensors, the members realized that the response time is too long ( > 30 ms) which didn't meet the project's requirement to use the HC-SR04 sensor. The [HC-SR04 datasheet](https://www.mouser.com/ds/2/813/HCSR04-1022824.pdf) mentions that the pulse to send a wave through the trigger should have around 0.01 ms.
 
