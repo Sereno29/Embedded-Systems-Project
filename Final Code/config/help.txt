@@ -1,0 +1,6 @@
+Compiling code:
+    cd Final\ Code // Go to the final code directory
+    arm-linux-gnueabihf-gcc free.c motor.c setup.c sonar.c motor.c main.c  -Llib -lsoc -lpthread -o final
+
+Passing the executable to the BeagleBoneBlack:
+    scp final debian@192.168.6.2:/home/debian // this will work if the BBB is connected through USB and if you are in the repository that the executable is

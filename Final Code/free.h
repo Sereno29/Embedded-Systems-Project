@@ -3,7 +3,7 @@
 
     #include "libs.h"
 
-    // FUNCTIONS
+    // FUNCTION
     void kill_car(void);
 
 #endif
