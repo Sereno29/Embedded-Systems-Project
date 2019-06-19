@@ -1,13 +1,18 @@
 # Embedded-Systems-Project (English)
 _Assisted Car Steering to Avoid Collisions_
 
+<p align="center">
+  <img src="/CarrinhoProntoImagens/isometrica.jpeg" width="300">
+</p>
+  
+
 This project focuses on the development of a car robot controlled remotely by a Xbox 360 controller connected through USB to a BeagleBone Black and with ultrassonic sensors providing assistance to the steering process of the robot. The sensors estimate the position of obstacles (walls) and avoid collisions by making the robot stop in a safe distance to the object:
 
 - Obstacles are 300 mm near the sensor: controller executes freely the commands from the user;
 - Obstacles between 300 and 200 mm near the sensor: executes the commands  given by the user but in a reduced maximum velocity;
 - Obstacles at a distance smaller than 200mm: the car is prohibited to accelerate in the direction of the obstacle;
 
-## Componentes - _Bill of Materials_
+## Components - _Bill of Materials_
 - Beaglebone Black Rev C, with Debian 9.5 2018-10-07 4GB SD IoT installled;
 - [L298N Motor Drive Controller Board Module Dual H Bridge](https://www.amazon.com/Qunqi-Controller-Module-Stepper-Arduino/dp/B014KMHSW6/ref=pd_cp_328_2?pd_rd_w=2spqf&pf_rd_p=ef4dc990-a9ca-4945-ae0b-f8d549198ed6&pf_rd_r=5PYWEXETQC33M4BDRFQP&pd_rd_r=76c4bafe-91f5-11e9-8704-597ede040640&pd_rd_wg=oJWKh&pd_rd_i=B014KMHSW6&psc=1&refRID=5PYWEXETQC33M4BDRFQP);
 - Two (2x) [DC Motors DG01D-A130 3-6V](https://www.alibaba.com/product-detail/3v-6v-9v-dc-flat-motor_60755111901.html?spm=a2700.7724857.normalList.149.66fddd90uUyg67);
@@ -17,9 +22,35 @@ This project focuses on the development of a car robot controlled remotely by a 
 - Voltage regulator circuit to power the BeagleBone through the 9V Battery
 - Jumpers, protoboard...
 
+<img src="/CarrinhoProntoImagens/frontal.jpeg" width="400"><img src="/CarrinhoProntoImagens/lateral.jpeg" width="400">
+
 ## History of the Project
 
-In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application.
+In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application. The library demanded had to come from the proper architecture sources, then the ARM architecture was required on the sources.list repo, as suggested by the own Travis Lane:
+```
+# Mark existing sources as amd64/i386 for x86
+sudo sed -i.bak "s/deb /deb [arch=amd64,i386] /g" /etc/apt/sources.list
+
+# Add ARM repos
+sudo tee -a /etc/apt/sources.list << END
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs` main multiverse restricted universe
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs`-updates main multiverse restricted universe
+END
+
+# Add armhf
+sudo dpkg --add-architecture armhf
+
+# Refresh your package cache
+sudo apt update
+
+# Install the armhf version of the library
+sudo apt install libudev-dev:armhf
+```
+Then, on the terminal, the compilation was run as follow (e.g. with the pwm sources and output named "test"):
+```
+arm-linux-gnueabihf-gcc bbb_pwm.c bbb_pwm_example.c -o test -ludev
+```
+Nevertheless, cross-compiling with this API had not lead to signifcant results once the problems with Device Tree Overlays arise.
 
 After this initial attempt, the members opted to try the [BoneScript library](https://beagleboard.org/Support/BoneScript/) in order to develop the coding of the project in a similar way as we would program an Arduino, since the BoneScript library is very similar commands to the Arduino library. This library is based on the JavaScript language and runs through the help of the Node.js interpreter already within the BeagleBone Black. However, during some tests regarding the response time of the language to the activation of the sensors, the members realized that the response time is too long ( > 30 ms) which didn't meet the project's requirement to use the HC-SR04 sensor. The [HC-SR04 datasheet](https://www.mouser.com/ds/2/813/HCSR04-1022824.pdf) mentions that the pulse to send a wave through the trigger should have around 0.01 ms.
 
@@ -79,7 +110,31 @@ Esse projeto consiste em desenvolver um carrinho controlado remotamente por cont
 
 ## Histórico
 
-Primeiramente, os membros do grupo encontraram uma [API](https://github.com/Coderlane/c-pwm-api) no github em linguagem C e tentaram fazer a cross-compilation do código na BeagleBone Black. Essa tentativa de compilação não resultou em sucesso, uma vez que a API (Application Programming Interface) utilizava a bibliteca udev e a expertise do grupo quanto a cross-compile e sistemas Debian (ativando pwm e gpios por meio do comando config-pin ou pelo arquivo uEnv.txt) ainda estava em desenvolvimento. Muito obrigado ao [Travis Lane](https://github.com/coderlane), o criador da API, por ter nos ajudado quanto a nossas perguntas a respeito do código e cross-compile! Infelizmente, não utilizamos a API na nossa aplicação.
+Primeiramente, os membros do grupo encontraram uma [API](https://github.com/Coderlane/c-pwm-api) no github em linguagem C e tentaram fazer a cross-compilation do código na BeagleBone Black. Essa tentativa de compilação não resultou em sucesso, uma vez que a API (Application Programming Interface) utilizava a bibliteca udev e a expertise do grupo quanto a cross-compile e sistemas Debian (ativando pwm e gpios por meio do comando config-pin ou pelo arquivo uEnv.txt) ainda estava em desenvolvimento. Muito obrigado ao [Travis Lane](https://github.com/coderlane), o criador da API, por ter nos ajudado quanto a nossas perguntas a respeito do código e cross-compile! Infelizmente, não utilizamos a API na nossa aplicação. A biblioteca exigida precisava ser baixada para a arquitetura do target (Beaglebone), sendo necessário a indicação da arquitetura ARM nas fontes do arquivo 'sources.list' no Ubuntu. Como sugerido pelo próprio Travis:
+```
+# Marcando as fontes existentes para a arquitetura amd64/i386 for x86
+sudo sed -i.bak "s/deb /deb [arch=amd64,i386] /g" /etc/apt/sources.list
+
+# Adicionando ARM repos
+sudo tee -a /etc/apt/sources.list << END
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs` main multiverse restricted universe
+deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports/ `lsb_release -cs`-updates main multiverse restricted universe
+END
+
+# Add armhf
+sudo dpkg --add-architecture armhf
+
+# Refresh your package cache
+sudo apt update
+
+# Instalando a versão arm da biblioteca ludev
+sudo apt install libudev-dev:armhf
+```
+Então, no terminal, a compilação era feita como descrito abaixo (exem. para um arquivo resultante "test" usando códigos pwm):
+```
+arm-linux-gnueabihf-gcc bbb_pwm.c bbb_pwm_example.c -o test -ludev
+```
+Entretanto, a compilação cruzada com essa API não gerou resultados desejáveis já que os problemas com Device Tree Overlays apareceram.
 
 Após essa primeira tentativa, foi utilizada a biblioteca [BoneScript](https://beagleboard.org/Support/BoneScript/) para desenvolver os códigos do projeto. Essa biblioteca é baseada em JavaScript e roda sobre o interpretador Node.js na Beaglebone Black, porém ao testar a implementação em JavaScript para os sensores de ultrassom percebeu-se um tempo de resposta muito grande (> 30 ms) para tal aplicação sendo assim crítico para o projeto o uso dessa linguagem. 
 
