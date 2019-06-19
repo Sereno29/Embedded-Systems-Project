@@ -1,0 +1,119 @@
+Installing libsoc for cross-compiling in a PC with architecture amd64 (e.g. Ubuntu 16.04)
+
+Source: https://github.com/jackmitch/libsoc/issues/29
+General installation information: https://github.com/jackmitch/libsoc
+
+This installation guide was done in ~/Documents. So the paths to the libtool repository may change for you if you install it in another location. Have fun!!!
+
+First of all, you should make sure that you have installed the autotools build system. Because our project uses the Debian OS, the autotools to be installed are:
+	-autoconf
+	-build-essential
+	-libtool-bin
+	-pkg-config
+
+You can make the following command to install all of them:
+sudo apt install autoconf build-essential libtool-bin pkg-config
+
+This project doesn't makes use of python, but if your does, feel free to install the python2-devel and python3-devel packages.
+
+Commands to install:
+	autoreconf -i // Use this command if it is the first time that you install libsoc
+	./configure --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf --build=x86_64-linux // Configuring the library to cross-compile
+OBS: If you are going to use the same kernel as we did, you should now make the changes in the file pwm.c that should be in the ./lib directory
+	make clean // run this command if you have already installed the library
+	make V=1
+	make install // (try with sudo)
+
+
+If you already have installed the library and want to make changes to it or use another configuration and recompile it, do as following:
+	./configure --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf --build=x86_64-linux // if you want to cross-compile to another target
+	make clean
+	make V=1
+	sudo make install // (try with sudo)
+
+Commands that might helpwith the installation process:
+	./configure --help // seeing help to use the configure command
+	file /usr/local/lib/libsoc.so.2.4.2 // seeing for what architecture the library binary was installed. The .so of the libsoc library is located in /usr/local/lib
+	ln -s file_to_be_linked name_of_the_link // making a link to a file. Use it to create a link to the library generated. For more information use man ln
+
+Making the compilation time library (file with extension .a) with the files .o given in the installation:
+	cd ~/Documents/libsoc/lib/ // going to the directory where the .o were installed
+	arm-linux-gnueabihf-ar rs libsoc.a *.o
+
+Cross-compiling the test code with the .a library:
+	ln -s /usr/local/lib/libsoc.so.2.4.2 libsoc.so // creating link to the librarie inside the repository where your source code is
+	arm-linux-gnueabihf-gcc gpio_test.c -L. -lsoc -lpthread -o gpio // indicate where the libraries are, .h, .c, .a, (-L. = the libraries are in directory . which can be seen with the pwd command) and what to link (-libsoc). You shoud use the file .a to compile your code, i.e, the file .a should be in the same directory as the .h and .c.
+
+You should try to compile and run the test codes that come in the libsoc library into your BeagleBone Black to see if they run as expected. If not, you are in the right track to learn more about the Linux System. You should either change your uEnv.txt or try the command config-pin. Be careful with changing the uEnv.txt, it may cause unwanted behavior as the BeagleBone may not want to boot again... hahaha. Below there are some links to helpful sites about using pwm and gpio:  
+	-https://stackoverflow.com/questions/50203064/pwm-on-beaglebone-black-v4-14
+	-https://stackoverflow.com/questions/50204329/pwm-chip-to-pin-mapping-on-beaglebone-black-v4-14
+	-https://www.teachmemicro.com/beaglebone-black-pwm-ubuntu-device-tree/
+	-https://groups.google.com/forum/#!topic/beagleboard/EYSwmyxYjdM
+	-https://github.com/beagleboard/bb.org-overlays/issues/76
+	-https://briancode.wordpress.com/2015/01/06/working-with-pwm-on-a-beaglebone-black/
+	-https://zeekhuge.me/post/a_handfull_of_commands_and_scripts_to_get_started_with_beagleboneblack/
+	-https://www.youtube.com/watch?v=MT3wjlzQhNQ
+	-https://www.youtube.com/watch?v=MFtgvnBCdn4
+
+In our project, the approach that worked was the following: we activated the cape-universala overlay in the uEnv.txt, which was the default in the uEnv.txt. After that we made a script (.sh) which configures the pins that should be used in the project. This script uses the config-pin command to enable ports to pwm state and also gpios to input and output mode. After that, running the test code should work if you used the right ports in your configuration and in your code.
+
+Another way would be to configure the ports to pwm through the uEnv.txt. This can be accomplished by:
+	Adding/Enabling pwm into /sys/class/pwm
+		uboot_overlay_addr0=/lib/firmware/BB-PWM2-00A0.dtbo // Add this line to the file uEnv.txt in /boot. The device tree to enable overlays is in /sys/firmware. The names of the firmware are in /lib/firmware. This should enable the PWM subsystem 2!
+
+After this, the config-pin might not work with the ports exported. You may need to use sudo powers to control the port. This way didn't work for our group, so good look with it! We think it should still work, but now you are on your own.
+
+Help resources:
+
+Compiling with a .a file (https://latedev.wordpress.com/2011/07/09/the-gcc-command-line-part-2/):
+	g++ rmain.cpp libmystuff.a -o roll // adding the library to the compile command
+
+PWM Names to enable in uEnv.txt (can be found in /lib/firmware):
+	BB-PWM0-00A0.dtbo
+	BB-PWM1-00A0.dtbo
+	BB-PWM2-00A0.dtbo
+
+Setting the pin configutation to a PWM:
+	config-pin -l P9_42 // seeing the possible states that the pin can function
+	config-pin -a P9_42 pwm // changing the state of the pin to pwm
+	config-pin -q P9_42 pwm // checking if the configuration was successful
+
+Making commands through the terminal inside of /sys/class/pwm/pwmchip%d/pwm-%d:%d :
+	sudo sh -c "echo 4000 > period"
+
+Changing libsoc to find the right path to the pwms:
+	sprintf(path, "/sys/class/pwm/pwmchip%d/pwm-%d:%d/polarity", pwm->chip, pwm->chip, pwm->pwm);
+
+Showing configurations in the uEnv.txt to try to solve the pinmux not found message:
+	sudo /opt/scripts/tools/version.sh
+
+Seeing the pins that can be configured by pin-config:
+	cd /sys/devices/platform/ocp // directory where the pins can be configured
+
+Inside of /sys/class/pwm, we should have the following:
+
+    pwmchip0: eCAP0 - controls only one PWM which is in pin P9_42
+    pwmchip1: ePWM0 - EHRPWM0- controls two PWM pins which are P9_22 and P9_21 (which are PWM0A and PWM0B, respectively, should confirm with a multimeter) - 4830 0200 (address in the memory map of the processor)
+    pwmchip4: ePWM1 - EHRPWM1 - controls two PWM pins which are P9_14 and P9_16 ( which are PWM1A and PWM1B, respectively, should confirm with a multimeter) - 4830 2200 (address in the memory map of the processor)
+    pwmchip7: ePWM2 - EHRPWM2 - controls two PWM pins which are P8_19 and P8_13 (which are PWM2A and PWM2B, respectively, should confirm with a multimeter) - 4830 4200 (address in the memory map of the processor)
+
+    source: https://stackoverflow.com/questions/50204329/pwm-chip-to-pin-mapping-on-beaglebone-black-v4-14/50204330#50204330
+
+Rebuilding .a and .so from libsoc because of the changes in pwm.c path to the exported pwm pins. The commands presented an error at the end. We advise you to use the commands given earlier in this guide:
+
+	arm-linux-gnueabihf-gcc -c pwm.c // generating the .o for the pwm.c code
+	arm-linux-gnueabihf-ar rs libsoc.a *.o // generating the .a for the new library
+	arm-linux-gnueabihf-gcc -fPIC -shared -o libsoc.so.2.4.2 *.c
+
+	-fPIC
+           If supported for the target machine, emit position-independent
+           code, suitable for dynamic linking and avoiding any limit on the
+           size of the global offset table.  This option makes a difference on
+           AArch64, m68k, PowerPC and SPARC.
+
+           Position-independent code requires special support, and therefore
+           works only on certain machines.
+
+           When this flag is set, the macros "__pic__" and "__PIC__" are
+           defined to 2.
+
