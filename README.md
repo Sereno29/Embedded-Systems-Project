@@ -2,7 +2,7 @@
 _Assisted Car Steering to Avoid Collisions_
 
 <p align="center">
-  <img src="/CarrinhoProntoImagens/isometrica.jpeg" width="300">
+  <img src="/Car Images/gif2.gif" width="600">
 </p>
   
 
@@ -14,15 +14,15 @@ This project focuses on the development of a car robot controlled remotely by a 
 
 ## Components - _Bill of Materials_
 - Beaglebone Black Rev C, with Debian 9.5 2018-10-07 4GB SD IoT installled;
-- [L298N Motor Drive Controller Board Module Dual H Bridge](https://www.amazon.com/Qunqi-Controller-Module-Stepper-Arduino/dp/B014KMHSW6/ref=pd_cp_328_2?pd_rd_w=2spqf&pf_rd_p=ef4dc990-a9ca-4945-ae0b-f8d549198ed6&pf_rd_r=5PYWEXETQC33M4BDRFQP&pd_rd_r=76c4bafe-91f5-11e9-8704-597ede040640&pd_rd_wg=oJWKh&pd_rd_i=B014KMHSW6&psc=1&refRID=5PYWEXETQC33M4BDRFQP);
+- [L298N Motor Drive Controller Board Module Dual H Bridge](http://www.baudaeletronica.com.br/driver-motor-ponte-h-l298n.html);
 - Two (2x) [DC Motors DG01D-A130 3-6V](https://www.alibaba.com/product-detail/3v-6v-9v-dc-flat-motor_60755111901.html?spm=a2700.7724857.normalList.149.66fddd90uUyg67);
 - Three (3x) [Ultrassonic Sensors HC-SR04](https://www.alibaba.com/product-detail/HC-SR04-Ultrasonic-Sensor-Module-HC_60787536064.html?spm=a2700.7724857.normalList.76.4ac73e2eXOXmhw);
 - 9V Li-Po Battery;
 - [MH Level converter](https://www.mepits.com/product/2413/converters/mh-level-converter);
-- Voltage regulator circuit to power the BeagleBone through the 9V Battery
+- [Power Converter](https://www.filipeflop.com/produto/regulador-de-tensao-lm2596-conversor-dc-dc-step-down/) circuit to power the BeagleBone through the 9V Battery;
 - Jumpers, protoboard...
 
-<img src="/CarrinhoProntoImagens/frontal.jpeg" width="400"><img src="/CarrinhoProntoImagens/lateral.jpeg" width="400">
+<img src="/Car Images/isometrica.jpeg" width="400"><img src="/Car Images/frontal.jpeg" width="400">
 
 ## History of the Project
 
@@ -92,6 +92,10 @@ Source: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
 # Projeto de Sistemas Embarcados (Português)
 _Robô com Direção Assistida para Prevenção de Colisões_
 
+<p align="center">
+  <img src="/Car Images/gif1.gif" height="400">
+</p>
+
 Esse projeto consiste em desenvolver um carrinho controlado remotamente por controle de Xbox 360 conectado por USB a uma BeagleBone Black, além de possuir auxílio de direção por meio de sensores de ultrassom. Os sensores estimam a posição de obstáculos (paredes) e evitam a colisão alterando o comportamento do carro:
 
 - Obstáculos afastados em mais de 300 mm: direção livre pelo joystick;
@@ -105,7 +109,7 @@ Esse projeto consiste em desenvolver um carrinho controlado remotamente por cont
 - Três (3x) [Sensores de Ultrassom HC-SR04](https://www.robocore.net/loja/sensores/sensor-de-distancia-ultrassonico-hc-sr04);
 - Bateria Li-Po 9V;
 - [MH Level converter](https://www.mepits.com/product/2413/converters/mh-level-converter);
-- Circuito Regulador de Tensão para alimentar a BeagleBone Black por meio da bateria de 9V
+- Circuito [Regulador de Tensão](https://www.filipeflop.com/produto/regulador-de-tensao-lm2596-conversor-dc-dc-step-down/) para alimentar a BeagleBone Black por meio da bateria de 9V;
 - Jumpers, protoboard...
 
 ## Histórico
