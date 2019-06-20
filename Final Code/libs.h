@@ -45,8 +45,8 @@
     #include "free.h"
 
 // ===== SENSOR'S PINOUT ============================    
-    #define GPIO_TRIGGER  45
-    #define GPIO_ECHO   44
+    #define GPIO_TRIGGER  45 // P8_11
+    #define GPIO_ECHO   44  // P8_12
 
 // ===== USB DEFINITIONS TO CHARACTERIZE EVENTS ============================
     #define JS_EVENT_BUTTON	0x01	// Button pressed released

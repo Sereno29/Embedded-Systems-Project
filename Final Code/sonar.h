@@ -3,7 +3,7 @@
 
     #include "libs.h"
 
-    // FUNCTIONS
-    void sonar_distance(gpio *trigger, gpio *echo);
+    // FUNCTIONS HEADERS
 
+    void sonar_distance(gpio *trigger, gpio *echo); // Function to calculate the distance seen by the US Sensor and change the flag accordingly
 #endif
