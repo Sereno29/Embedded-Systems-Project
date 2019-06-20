@@ -24,6 +24,8 @@ This project focuses on the development of a car robot controlled remotely by a 
 
 <img src="/Car Images/isometrica.jpeg" width="400"><img src="/Car Images/frontal.jpeg" width="400">
 
+<img src="project_schematic.png" width="400">
+
 ## History of the Project
 
 In the beginning of the project, the members of the group found an [API](https://github.com/Coderlane/c-pwm-api) in C language in github and tried to cross-compile the code to the BeagleBone Black. This attempt didn't work since the API (Application Programming Interface) used the udev library and our expertise into cross-compile and Debian system(enabling pwm through config-pin or uEnv.txt) was still very poor. Many thanks to [Travis Lane](https://github.com/coderlane) who helped us with our questions! Unfortunately, we didn't use the API in our application. The library demanded had to come from the proper architecture sources, then the ARM architecture was required on the sources.list repo, as suggested by the own Travis Lane:
