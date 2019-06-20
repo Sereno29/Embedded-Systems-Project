@@ -138,7 +138,7 @@ int main(){
 
 					case 1: // Brake with B button
 						if(e.value == 1){
-							printf("Breaking\n");
+							printf("braking\n");
 						}
 					break;
 

@@ -48,7 +48,7 @@ void engine (int number, float value){
 			if(value < 0){
 				vmax = 0;
 				REng = LEng = vmax;
-				breaking();
+				braking();
 			}else{
 				vmax = abs(value*conversion);
 				REng = LEng = vmax;
@@ -139,7 +139,7 @@ int main(){
 							accelerate_motor_right(1, vturn);
 							accelerate_motor_left(0, vturn);
 							sleep(DELAY);
-							breaking();
+							braking();
 						}
 					break;
  
@@ -148,13 +148,13 @@ int main(){
 							accelerate_motor_right(0, vturn);
 							accelerate_motor_left(1, vturn);
 							sleep(DELAY);
-							breaking();
+							braking();
 						}
 					break;
 
 					case 1: // Brake with B button
 						if(e.value == 1){
-							breaking();
+							braking();
 							sleep(1);
 						}
 					break;
