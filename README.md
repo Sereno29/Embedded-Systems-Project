@@ -24,7 +24,7 @@ This project focuses on the development of a car robot controlled remotely by a 
 
 <img src="/Car Images/isometrica.jpeg" width="400"><img src="/Car Images/frontal.jpeg" width="400">
 
-<img src="project_schematic.png" width="400">
+<img src="project_schematic.png" width="800">
 
 ## History of the Project
 
