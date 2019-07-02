@@ -186,6 +186,9 @@ Fonte: [BlackLib v3.0](https://github.com/yigityuce/BlackLib/tree/master/v3_0)
 
 Fonte: [Libsoc](https://jackmitch.github.io/libsoc/#documentation)
 
+## Vídeo/Video
+[Vídeo Explicativo do Projeto/Explicative Video of the Project](https://www.youtube.com/watch?v=FB32_VrlREc&feature=youtu.be)
+
 ## Desenvolvedores/Developers
 - [Caique Garbin](https://github.com/caiquegarbin)
 - [Leonardo Felipe L. S. dos Santos](https://github.com/qleonardolp)
